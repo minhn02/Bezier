@@ -1,7 +1,0 @@
-[
-{
-  "directory": "/home/minh/Bezier/build",
-  "command": "/usr/bin/c++  -I/home/minh/Bezier/include -isystem /usr/include/eigen3 -g -o CMakeFiles/Bezier.dir/src/bezier.cpp.o -c /home/minh/Bezier/src/bezier.cpp",
-  "file": "/home/minh/Bezier/src/bezier.cpp"
-}
-]

@@ -6,7 +6,7 @@ enable_testing()
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
 
-add_library(Bezier src/bezier.cpp include/bezier.h)
+add_library(Bezier src/bezier.cpp include/bezier.h src/util.cpp src/util.h)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
