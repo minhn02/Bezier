@@ -1,9 +1,8 @@
 #include "bezier.h"
 
 namespace Bezier {
-    Curve::Curve(std::vector<VectorXd> pointList) {
-        Curve:Curve(pointList, 1);
-    }
+
+    Curve::Curve(std::vector<VectorXd> pointList) : Curve(pointList, 1) {}
 
     Curve::Curve(std::vector<VectorXd> pointList, double T) {
         assert(pointList.size() > 0);
@@ -12,17 +11,15 @@ namespace Bezier {
         order_ = pointList.size();
         dim_ = pointList[0].size();
         T_ = T;
-        coefficients_ = Util::generateBinomialCoefficients(order_ + 1);
-        std::map<int, Curve> dMap;
-        dMap_ = &dMap;
+        coefficients_ = Util::generateBinomialCoefficients(order_ - 1);
     }
 
     VectorXd Curve::evaluate(double t) {
         VectorXd runningSum = VectorXd::Zero(dim_);
         for (int i = 0; i < order_; i++) {
             runningSum += coefficients_[i] *
-                          std::pow((1 - t), (order_ - i)) *
-                          std::pow(t, i) *
+                          std::pow(((T_ - t)/T_), (order_ - 1 - i)) *
+                          std::pow(t / T_, i) *
                           pointList_[i];
         }
         return runningSum;
@@ -39,7 +36,7 @@ namespace Bezier {
             return evaluate(t);
         }
 
-        Curve derivative = generateDerivativeCurve();
+        Curve derivative = this->generateDerivativeCurve();
         if (n == 1) {
             return derivative.evaluate(t);
         } else {
@@ -55,15 +52,15 @@ namespace Bezier {
     }
 
     Curve Curve::generateDerivativeCurve() {
-        if (!dMap_->count(1)) {
-            std::vector<VectorXd> pointList(dim_);
-            for (int i = order_ - 1; i > 0; i--) {
-                VectorXd point = order_ * (pointList[i+1] - pointList[i]);
-                pointList.push_back(point);
+        if (!dMap_.count(1)) {
+            std::vector<VectorXd> pointList;
+            for (int i = 0; i < order_ - 1; i++) {
+                VectorXd point = (order_ - 1) * (pointList_[i+1] - pointList_[i]);
+                pointList.insert(pointList.begin() + i, point);
             }
-            dMap_->emplace(1, Curve(pointList));
+            dMap_.insert({1, Curve(pointList)});
         }
 
-        return dMap_->at(1);
+        return dMap_.at(1);
     }
 }

@@ -60,14 +60,15 @@ namespace Bezier {
         /**
          * Returns a new curve that is the derivative of the current curve
         */
-        Curve::Curve generateDerivativeCurve();
+        Curve generateDerivativeCurve();
 
+        private:
         std::vector<VectorXd> pointList_;
         int dim_;
         int order_;
         double T_;
         std::vector<double> coefficients_;
-        std::map<int, Curve> *dMap_;
+        std::map<int, Curve> dMap_;
     };
 
     class Spline {
