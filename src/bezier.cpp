@@ -40,7 +40,6 @@ namespace Bezier {
         if (n == 1) {
             return derivative.evaluate(t);
         } else {
-            //TODO cache recursive calculations of curves to dMap
             return derivative.dEvaluate(n - 1, t);
         }
     }
@@ -58,7 +57,7 @@ namespace Bezier {
                 VectorXd point = (order_ - 1) * (pointList_[i+1] - pointList_[i]);
                 pointList[i] = point;
             }
-            dMap_.insert({1, Curve(pointList)});
+            dMap_.insert({1, Curve(pointList, T_)});
         }
 
         return dMap_.at(1);
