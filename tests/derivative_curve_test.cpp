@@ -54,32 +54,32 @@ void test_d_d_cubic_curve_evaluation() {
     Bezier::Curve curve({P0, P1, P2, P3});
 
     // check output vectors, round to 3 decimal places; points evaluated using python script, see top of file
-    VectorXd curve0(2); curve0 << 10, 5;
-    VectorXd curve01(2); curve01 << 9.397, 4.232;
-    VectorXd curve02(2); curve02 << 8.776, 3.776;
-    VectorXd curve03(2); curve03 << 8.119, 3.704;
-    VectorXd curve04(2); curve04 << 7.408, 4.088;
-    VectorXd curve05(2); curve05 << 6.625, 5;
-    VectorXd curve06(2); curve06 << 5.752, 6.512;
-    VectorXd curve07(2); curve07 << 4.771, 8.696;
-    VectorXd curve08(2); curve08 << 3.664, 11.624;
-    VectorXd curve09(2); curve09 << 2.413, 15.368;
-    VectorXd curve1(2); curve1 << 1, 20;
+    VectorXd curve0(2); curve0 << 0, 24;
+    VectorXd curve01(2); curve01 << -1.8, 31.2;
+    VectorXd curve02(2); curve02 << -3.6, 38.4;
+    VectorXd curve03(2); curve03 << -5.4, 45.6;
+    VectorXd curve04(2); curve04 << -7.2, 52.8;
+    VectorXd curve05(2); curve05 << -9, 60;
+    VectorXd curve06(2); curve06 << -10.8, 67.2;
+    VectorXd curve07(2); curve07 << -12.6, 74.4;
+    VectorXd curve08(2); curve08 << -14.4, 81.6;
+    VectorXd curve09(2); curve09 << -16.2, 88.8;
+    VectorXd curve1(2); curve1 << -18, 96;
 
-    assert((curve.evaluate(0) - curve0).norm() < 0.01);
-    assert((curve.evaluate(0.1) - curve01).norm() < 0.01);
-    assert((curve.evaluate(0.2) - curve02).norm() < 0.01);
-    assert((curve.evaluate(0.3) - curve03).norm() < 0.01);
-    assert((curve.evaluate(0.4) - curve04).norm() < 0.01);
-    assert((curve.evaluate(0.5) - curve05).norm() < 0.01);
-    assert((curve.evaluate(0.6) - curve06).norm() < 0.01);
-    assert((curve.evaluate(0.7) - curve07).norm() < 0.01);
-    assert((curve.evaluate(0.8) - curve08).norm() < 0.01);
-    assert((curve.evaluate(0.9) - curve09).norm() < 0.01);
-    assert((curve.evaluate(1) - curve1).norm() < 0.01);
+    assert((curve.dEvaluate(2, 0) - curve0).norm() < 0.01);
+    assert((curve.dEvaluate(2, 0.1) - curve01).norm() < 0.01);
+    assert((curve.dEvaluate(2, 0.2) - curve02).norm() < 0.01);
+    assert((curve.dEvaluate(2, 0.3) - curve03).norm() < 0.01);
+    assert((curve.dEvaluate(2, 0.4) - curve04).norm() < 0.01);
+    assert((curve.dEvaluate(2, 0.5) - curve05).norm() < 0.01);
+    assert((curve.dEvaluate(2, 0.6) - curve06).norm() < 0.01);
+    assert((curve.dEvaluate(2, 0.7) - curve07).norm() < 0.01);
+    assert((curve.dEvaluate(2, 0.8) - curve08).norm() < 0.01);
+    assert((curve.dEvaluate(2, 0.9) - curve09).norm() < 0.01);
+    assert((curve.dEvaluate(2, 1) - curve1).norm() < 0.01);
 }
 
 int main(int argc, char const *argv[]) {
     test_d_cubic_curve_evaluation();
-    // test_d_d_cubic_curve_evaluation();
+    test_d_d_cubic_curve_evaluation();
 }

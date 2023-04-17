@@ -53,14 +53,43 @@ namespace Bezier {
 
     Curve Curve::generateDerivativeCurve() {
         if (!dMap_.count(1)) {
-            std::vector<VectorXd> pointList;
+            std::vector<VectorXd> pointList(order_ - 1);
             for (int i = 0; i < order_ - 1; i++) {
                 VectorXd point = (order_ - 1) * (pointList_[i+1] - pointList_[i]);
-                pointList.insert(pointList.begin() + i, point);
+                pointList[i] = point;
             }
             dMap_.insert({1, Curve(pointList)});
         }
 
         return dMap_.at(1);
+    }
+
+    Spline::Spline(std::vector<Curve> curves, double T) {
+        curves_ = curves;
+        T_ = T;
+    }
+
+    Spline::Spline(std::vector<VectorXd> points, double T) {
+        T_ = T;
+
+        
+    }
+
+    VectorXd Spline::evaluate(double t) {
+        // calculate curve in spline to evaluate
+        int index = std::floor(T_ / t);
+
+        return curves_[index].evaluate(t);
+    }
+
+    VectorXd Spline::dEvaluate(double t) {
+        return dEvaluate(1, t);
+    }
+
+    VectorXd Spline::dEvaluate(int n, double t) {
+        // calculate curve in spline to evaluate
+        int index = std::floor(T_ / t);
+
+        return curves_[index].dEvaluate(n, t);
     }
 }

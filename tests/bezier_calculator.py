@@ -66,6 +66,6 @@ def evaluate_quintic():
 		print("t: {}, value: {}".format(i, quintic_bezier_curve(i, P0, P1, P2, P3, P4, P5)))
 
 # evaluate_cubic()
-evaluate_d_cubic()
-# evaluate_d_d_cubic()
+# evaluate_d_cubic()
+evaluate_d_d_cubic()
 # evaluate_quintic()
