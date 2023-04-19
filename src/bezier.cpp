@@ -70,8 +70,26 @@ namespace Bezier {
 
     Spline::Spline(std::vector<VectorXd> points, double T) {
         T_ = T;
+        int n = points.size();
 
-        
+        std::vector<Curve> curveList(n-1);
+
+        // u_k (time delta between points) from (8.13) pg 514 Trajectory Planning For Automatic Machines and Robots
+        // (8.49) pg 400 of Trajectory Planning For Automatic Machines and Robots
+        double d = 0;
+        for (int k = 1; k < n; k++) {
+            d += (points[k] - points[k-1]).norm();
+        }
+
+        double u_k_1 = 0; 
+        for (int i = 1; i < n; i++) {
+            double u_k = u_k_1 + (points[i] - points[i-1]).norm() / d;
+            u_k_1 = u_k;
+
+            VectorXd P0 = points[i-1];
+            VectorXd P3 = points[i];
+
+        }
     }
 
     VectorXd Spline::evaluate(double t) {
