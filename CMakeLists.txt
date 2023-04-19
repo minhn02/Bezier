@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.0.0)
 project(Bezier VERSION 0.1.0)
 
-include_directories(${CMAKE_SOURCE_DIR}/include)
+include_directories(${CMAKE_SOURCE_DIR}/include /usr/local/lib)
 
 add_library(Bezier src/bezier.cpp include/bezier.h src/util.cpp src/util.h)
 find_package (Eigen3 3.3 REQUIRED NO_MODULE)
@@ -10,6 +10,9 @@ target_link_libraries (Bezier Eigen3::Eigen)
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 include(CPack)
+
+add_executable(optimization src/optimization.cpp src/bezier.cpp include/bezier.h src/util.cpp src/util.h)
+target_link_libraries(optimization Eigen3::Eigen)
 
 # Testing
 
