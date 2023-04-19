@@ -72,7 +72,7 @@ namespace Bezier {
         T_ = T;
         int n = points.size();
 
-        std::vector<Curve> curveList(n-1);
+        std::vector<Curve> curveList;
 
         // u_k (time delta between points) from (8.13) pg 514 Trajectory Planning For Automatic Machines and Robots
         // (8.49) pg 400 of Trajectory Planning For Automatic Machines and Robots

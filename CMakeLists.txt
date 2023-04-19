@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.0.0)
 project(Bezier VERSION 0.1.0)
 
-include_directories(${CMAKE_SOURCE_DIR}/include /usr/local/lib)
+include_directories(${CMAKE_SOURCE_DIR}/include /usr/local/include)
 
 add_library(Bezier src/bezier.cpp include/bezier.h src/util.cpp src/util.h)
 find_package (Eigen3 3.3 REQUIRED NO_MODULE)
@@ -11,8 +11,11 @@ set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 include(CPack)
 
+add_library(nlopt SHARED IMPORTED)
+set_target_properties(nlopt PROPERTIES IMPORTED_LOCATION /usr/local/lib/libnlopt.so)
+
 add_executable(optimization src/optimization.cpp src/bezier.cpp include/bezier.h src/util.cpp src/util.h)
-target_link_libraries(optimization Eigen3::Eigen)
+target_link_libraries(optimization Eigen3::Eigen nlopt)
 
 # Testing
 
