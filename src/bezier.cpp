@@ -2,15 +2,18 @@
 
 namespace Bezier {
 
-    Curve::Curve(std::vector<VectorXd> pointList) : Curve(pointList, 1) {}
+    Curve::Curve(std::vector<VectorXd> pointList) : Curve(pointList, 1, 0) {}
 
-    Curve::Curve(std::vector<VectorXd> pointList, double T) {
+    Curve::Curve(std::vector<VectorXd> pointList, double T): Curve(pointList, T, 0) {}
+
+    Curve::Curve(std::vector<VectorXd> pointList, double T, double t0) {
         assert(pointList.size() > 0);
 
         pointList_ = pointList;
         order_ = pointList.size();
         dim_ = pointList[0].size();
         T_ = T;
+        t0_ = t0;
         coefficients_ = Util::generateBinomialCoefficients(order_ - 1);
     }
 
@@ -18,8 +21,8 @@ namespace Bezier {
         VectorXd runningSum = VectorXd::Zero(dim_);
         for (int i = 0; i < order_; i++) {
             runningSum += coefficients_[i] *
-                          std::pow(((T_ - t)/T_), (order_ - 1 - i)) *
-                          std::pow(t / T_, i) *
+                          std::pow(((T_ - (t-t0_))/T_), (order_ - 1 - i)) *
+                          std::pow((t - t0_)/(T_), i) *
                           pointList_[i];
         }
         return runningSum;
@@ -57,7 +60,7 @@ namespace Bezier {
                 VectorXd point = (order_ - 1) * (pointList_[i+1] - pointList_[i]);
                 pointList[i] = point;
             }
-            dMap_.insert({1, Curve(pointList, T_)});
+            dMap_.insert({1, Curve(pointList, T_, t0_)});
         }
 
         return dMap_.at(1);

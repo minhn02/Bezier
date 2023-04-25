@@ -35,6 +35,13 @@ namespace Bezier {
         Curve(std::vector<VectorXd> pointList, double T);
 
         /**
+         * @brief Instantiate a n'th order Bezier Curve defined by n control points over [t0,T+t0]
+         * @param pointList List of points that define a bezier curve
+         * @param T the interval [0, T] over which the curve is defined
+        */
+        Curve(std::vector<VectorXd> pointList, double T, double t0);
+
+        /**
          * Evaluates the curve at t
         */
         VectorXd evaluate(double t);
@@ -67,6 +74,7 @@ namespace Bezier {
         int dim_;
         int order_;
         double T_;
+        double t0_;
         std::vector<double> coefficients_;
         std::map<int, Curve> dMap_;
     };
