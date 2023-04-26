@@ -2,6 +2,8 @@
 
 namespace Bezier {
 
+    Curve::Curve() {}
+
     Curve::Curve(std::vector<VectorXd> pointList) : Curve(pointList, 1, 0) {}
 
     Curve::Curve(std::vector<VectorXd> pointList, double T): Curve(pointList, T, 0) {}
@@ -66,38 +68,91 @@ namespace Bezier {
         return dMap_.at(1);
     }
 
-    Spline::Spline(std::vector<Curve> curves, double T) {
+    Spline::Spline(std::vector<Curve> curves, double T, double t0) {
         curves_ = curves;
         T_ = T;
+        t0_ = t0;
     }
 
-    Spline::Spline(std::vector<VectorXd> points, double T) {
+    Spline::Spline(std::vector<VectorXd> points, double T, double t0) {
+        initializePointList(points, T, t0);
+    }
+    
+    Spline::Spline(std::function<VectorXd(double)> func, int N, double T, double t0) {
+        std::vector<VectorXd> points(N);
+        double delta = T/(N-1);
+        int index = 0;
+        for (double i = 0; i <= T; i += delta) {
+            points[index] = func(i);
+            index += 1;
+        }
+        initializePointList(points, T, t0);
+    }
+
+    void Spline::initializePointList(std::vector<VectorXd> points, double T, double t0) {
         T_ = T;
-        int n = points.size();
+        t0_ = t0;
+        int n = points.size() - 1;
+        std::vector<double> uk(n+1);
+        std::vector<VectorXd> tk(n+1);
+        curves_.resize(n-1);
+        int dim = points[0].size();
 
-        std::vector<Curve> curveList;
-
-        // u_k (time delta between points) from (8.13) pg 366 Trajectory Planning For Automatic Machines and Robots
-        // (8.49) pg 400 of Trajectory Planning For Automatic Machines and Robots
+        // uk (time delta between points) from (8.13) pg 366 Trajectory Planning For Automatic Machines and Robots
+        // tk (tangent vectors at each point) from (8.49) pg 400 of Trajectory Planning For Automatic Machines and Robots
+        // calculate u_k according to cord length distribution
         double d = 0;
         for (int k = 1; k < n; k++) {
             d += (points[k] - points[k-1]).norm();
         }
-
-        double u_k_1 = 0; 
+        uk[0] = 0;
+        uk[n] = T_;
         for (int i = 1; i < n; i++) {
-            double u_k = u_k_1 + (points[i] - points[i-1]).norm() / d;
-            u_k_1 = u_k;
+            uk[i] = uk[i-1] + ((points[i] - points[i-1]).norm() / d) * T_;
+        }
 
-            VectorXd P0 = points[i-1];
-            VectorXd P3 = points[i];
+        std::vector<VectorXd> deltak(n+1);
+        std::vector<double> alphak(n);
+        // calculate deltak and alphak
+        for (int k = 1; k < n+1; k++) {
+            deltak[k] = (points[k] - points[k-1]).array() / (uk[k] - uk[k-1]);
+            // alphak only defined for 1 <= k <= n-1
+            if (k != n) {
+                alphak[k] = (uk[k] - uk[k-1]) / ((uk[k] - uk[k-1]) + (uk[k+1] - uk[k]));
+            }
+        }
 
+        // calculate tk
+        for (int k = 1; k < n; k++) {
+            tk[k] = (1 - alphak[k])*deltak[k] + (alphak[k]*deltak[k+1]);
+        }
+        // calculate endpoints
+        tk[0] = 2*deltak[1] - tk[1];
+        tk[n] = 2*deltak[n] - tk[n-1];
+
+        // bezier curves calculated from (8.51) pg 401 Trajectory Planning For Automatic Machines and Robots
+        // yields n-1 curves where len(points) = n
+        for (int i = 0; i < n-1; i++) {
+            // compute alpha
+            VectorXd a = 16 - (tk[i] + tk[i+1]).cwiseAbs2().array();
+            VectorXd b = 12 * (points[i+1] - points[i]) * (tk[i] + tk[i+1]);
+            VectorXd c = -36 * (points[i+1] - points[i]).cwiseAbs2();
+            VectorXd delta = b * b - 4 * a * c;
+            VectorXd alpha = (-1*b.array() - delta.array().sqrt()) / (2 * a.array());
+
+            // consruct curve
+            VectorXd P0 = points[i];
+            VectorXd P3 = points[i+1];
+            VectorXd P1 = P0 + (1/3)*alpha*tk[i];
+            VectorXd P2 = P3 - (1/3)*alpha*tk[i+1];
+            curves_[i] = Curve({P0, P1, P2, P3}, uk[i]);
         }
     }
 
     VectorXd Spline::evaluate(double t) {
         // calculate curve in spline to evaluate
-        int index = std::floor(T_ / t);
+        int n = curves_.size();
+        int index = std::floor((t / T_) * (n-1));
 
         return curves_[index].evaluate(t);
     }
