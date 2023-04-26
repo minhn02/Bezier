@@ -81,11 +81,19 @@ namespace Bezier {
 
     class Spline {
 
+        public:
         /**
          * Curves that form a continous spline over [0, T]
          * Each curve is spaced so it takes up T/len(curves) time
         */
         Spline(std::vector<Curve> curves, double T);
+
+
+        /**
+         * Curves that form a continous spline over [t0, T+t0]
+         * Each curve is spaced so it takes up T/len(curves) time
+        */
+        Spline(std::vector<Curve> curves, double T, double t0);
 
         /**
          * Interpolates between points which are over [0, T] with a 3rd degree bezier curve
@@ -93,9 +101,19 @@ namespace Bezier {
         Spline(std::vector<VectorXd> points, double T);
 
         /**
+         * Interpolates between points which are over [t0, T+t0] with a 3rd degree bezier curve
+        */
+        Spline(std::vector<VectorXd> points, double T, double t0);
+
+        /**
          * Splits func which is defined over [0, T] into N samples, and interpolates between them with a 3rd degree bezier curve
         */
-        Spline(std::function<double(double)> func, double T, int N);
+        Spline(std::function<VectorXd(double)> func, double T, int N);
+
+        /**
+         * Splits func which is defined over [t0, T+t0] into N samples, and interpolates between them with a 3rd degree bezier curve
+        */
+        Spline(std::function<VectorXd(double)> func, double T, double t0, int N);
 
         VectorXd evaluate(double t);
         VectorXd dEvaluate(double t);

@@ -27,7 +27,10 @@ add_executable(basic_curve_test include/bezier.h src/bezier.cpp tests/basic_curv
 target_link_libraries (basic_curve_test Eigen3::Eigen)
 add_executable(derivative_curve_test include/bezier.h src/bezier.cpp tests/derivative_curve_test.cpp src/util.h src/util.cpp)
 target_link_libraries (derivative_curve_test Eigen3::Eigen)
+add_executable(interpolation_test include/bezier.h src/bezier.cpp tests/interpolation_test.cpp src/util.h src/util.cpp)
+target_link_libraries (interpolation_test Eigen3::Eigen)
 
 add_test(binomial_test binomial_test COMMAND $<TARGET_FILE:cpp_test>)
 add_test(basic_curve_test basic_curve_test COMMAND $<TARGET_FILE:cpp_test>)
 add_test(derivative_curve_test derivative_curve_test COMMAND $<TARGET_FILE:cpp_test>)
+add_test(interpolation_test interpolation_test COMMAND $<TARGET_FILE:cpp_test>)

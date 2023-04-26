@@ -77,7 +77,7 @@ namespace Bezier {
 
         std::vector<Curve> curveList;
 
-        // u_k (time delta between points) from (8.13) pg 514 Trajectory Planning For Automatic Machines and Robots
+        // u_k (time delta between points) from (8.13) pg 366 Trajectory Planning For Automatic Machines and Robots
         // (8.49) pg 400 of Trajectory Planning For Automatic Machines and Robots
         double d = 0;
         for (int k = 1; k < n; k++) {
