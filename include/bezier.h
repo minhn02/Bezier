@@ -26,6 +26,8 @@ namespace Bezier {
         */
         Curve();
 
+        //TODO Change constructors to use default arguments 
+
         /**
          * @brief Instantiate a n'th order Bezier Curve defined by n control points over [0, 1]
          * @param pointList List of points that define a bezier curve
@@ -110,6 +112,7 @@ namespace Bezier {
 
         private:
         void initializePointList(std::vector<VectorXd> points, double T, double t0);
+        double calculateTangentMagnitude(VectorXd p0, VectorXd p3, VectorXd t0, VectorXd t3);
         std::vector<Curve> curves_;
         double T_;
         double t0_;

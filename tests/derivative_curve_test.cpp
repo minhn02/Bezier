@@ -113,8 +113,44 @@ void test_d_d_cubic_curve_evaluation_time_scaled() {
     assert((curve.dEvaluate(2, 10) - curve1).norm() < 0.01);
 }
 
+void test_d_d_cubic_curve_evaluation_time_scaled_shifted() {    
+    // initialize vectors
+    VectorXd P0(2); P0 << 10, 5;
+    VectorXd P1(2); P1 << 8, 2;
+    VectorXd P2(2); P2 << 6, 3;
+    VectorXd P3(2); P3 << 1, 20;
+
+    Bezier::Curve curve({P0, P1, P2, P3}, 10, 5);
+
+    // check output vectors, round to 3 decimal places; points evaluated using python script, see top of file
+    VectorXd curve0(2); curve0 << 0, 24;
+    VectorXd curve01(2); curve01 << -1.8, 31.2;
+    VectorXd curve02(2); curve02 << -3.6, 38.4;
+    VectorXd curve03(2); curve03 << -5.4, 45.6;
+    VectorXd curve04(2); curve04 << -7.2, 52.8;
+    VectorXd curve05(2); curve05 << -9, 60;
+    VectorXd curve06(2); curve06 << -10.8, 67.2;
+    VectorXd curve07(2); curve07 << -12.6, 74.4;
+    VectorXd curve08(2); curve08 << -14.4, 81.6;
+    VectorXd curve09(2); curve09 << -16.2, 88.8;
+    VectorXd curve1(2); curve1 << -18, 96;
+
+    assert((curve.dEvaluate(2, 5) - curve0).norm() < 0.01);
+    assert((curve.dEvaluate(2, 6) - curve01).norm() < 0.01);
+    assert((curve.dEvaluate(2, 7) - curve02).norm() < 0.01);
+    assert((curve.dEvaluate(2, 8) - curve03).norm() < 0.01);
+    assert((curve.dEvaluate(2, 9) - curve04).norm() < 0.01);
+    assert((curve.dEvaluate(2, 10) - curve05).norm() < 0.01);
+    assert((curve.dEvaluate(2, 11) - curve06).norm() < 0.01);
+    assert((curve.dEvaluate(2, 12) - curve07).norm() < 0.01);
+    assert((curve.dEvaluate(2, 13) - curve08).norm() < 0.01);
+    assert((curve.dEvaluate(2, 14) - curve09).norm() < 0.01);
+    assert((curve.dEvaluate(2, 15) - curve1).norm() < 0.01);
+}
+
 int main(int argc, char const *argv[]) {
     test_d_cubic_curve_evaluation();
     test_d_d_cubic_curve_evaluation();
     test_d_d_cubic_curve_evaluation_time_scaled();
+    test_d_d_cubic_curve_evaluation_time_scaled_shifted();
 }
