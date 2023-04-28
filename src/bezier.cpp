@@ -85,13 +85,12 @@ namespace Bezier {
         T_ = T;
         t0_ = t0;
         std::vector<VectorXd> points(N);
-        double delta = T/((double)N);
-        int index = 0;
-        for (double i = t0_; i <= t0_ + T; i += delta) {
-            points[index] = func(i);
-            index += 1;
+        double delta = T/((double)(N-1));
+        double t = t0_;
+        for (int i = 0; i < N; i++) {
+            points[i] = func(t);
+            t += delta;
         }
-        assert(index == N);
         initializePointList(points, T, t0);
     }
 
@@ -135,13 +134,13 @@ namespace Bezier {
         for (int i = 0; i < n; i++) {
             // compute alpha
             double alpha = calculateTangentMagnitude(points[i], points[i+1], tk[i], tk[i+1]);
-
+            double delta = uk[i+1] - uk[i];
             // consruct curve
             VectorXd P0 = points[i];
             VectorXd P3 = points[i+1];
-            VectorXd P1 = P0 + (1/3)*alpha*tk[i];
-            VectorXd P2 = P3 - (1/3)*alpha*tk[i+1];
-            curves_[i] = Curve({P0, P1, P2, P3}, uk[i+1] - uk[i], uk[i]);
+            VectorXd P1 = P0 + ((double)1/(double)3)*delta*tk[i];
+            VectorXd P2 = P3 - ((double)1/(double)3)*delta*tk[i+1];
+            curves_[i] = Curve({P0, P1, P2, P3}, delta, uk[i]);
         }
     }
 
@@ -149,21 +148,38 @@ namespace Bezier {
      * (8.52) pg 402 of trajectory textbook
     */
     double Spline::calculateTangentMagnitude(VectorXd p0, VectorXd p3, VectorXd t0, VectorXd t3) {
-        double a = 16 - std::pow((t0 + t3).norm(), 2);
+        double a = 16 - (t0 + t3).squaredNorm();
         double b = 12 * (p3 - p0).transpose().dot(t0 + t3);
-        double c = -36 * std::pow((p3 - p0).norm(), 2);
+        double c = -36 * (p3 - p0).squaredNorm();
 
-        double discriminant = std::pow(b, 2) - 4 * a * c;
+        double discriminant = b * b - 4 * a * c;
 
         if (discriminant < 0) {
-            return std::numeric_limits<double>::quiet_NaN();
+            throw std::runtime_error("The quadratic equation has no real solutions.");
         }
 
-        double alpha1 = (-b + std::sqrt(discriminant)) / (2 * a);
-        double alpha2 = (-b - std::sqrt(discriminant)) / (2 * a);
+        double sqrt_discriminant = std::sqrt(discriminant);
 
-        // Return the positive solution for alpha
-        return alpha1 > 0 ? alpha1 : alpha2;     
+        // Calculate the roots using a numerically stable method
+        double q;
+        if (b >= 0) {
+            q = -0.5 * (b + sqrt_discriminant);
+        } else {
+            q = -0.5 * (b - sqrt_discriminant);
+        }
+
+        double root1 = q / a;
+        double root2 = c / q;
+
+        if (root1 > 0 && root2 > 0) {
+            return std::min(root1, root2);
+        } else if (root1 > 0) {
+            return root1;
+        } else if (root2 > 0) {
+            return root2;
+        } else {
+            throw std::runtime_error("The quadratic equation has no positive solutions.");
+        }
     }
 
 
