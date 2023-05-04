@@ -4,10 +4,6 @@ namespace Bezier {
 
     Curve::Curve() {}
 
-    Curve::Curve(std::vector<VectorXd> pointList) : Curve(pointList, 1, 0) {}
-
-    Curve::Curve(std::vector<VectorXd> pointList, double T): Curve(pointList, T, 0) {}
-
     Curve::Curve(std::vector<VectorXd> pointList, double T, double t0) {
         assert(pointList.size() > 0);
 
@@ -125,14 +121,14 @@ namespace Bezier {
 
             tk[k] = (1 - alpha_k)*(delta_q_k/delta_u_k) + alpha_k*(delta_q_k_1/delta_u_k_1);
         }
-        // calculate endpoints
+        // calculate tk at endpoints
         tk[0] = 2 * ((points[1] - points[0]) / (uk[1] - uk[0])) - tk[1];
         tk[n] = 2 * ((points[n] - points[n-1]) / (uk[n] - uk[n-1])) - tk[n-1];
 
         // bezier curves calculated from (8.51) pg 401 Trajectory Planning For Automatic Machines and Robots
         // yields n-1 curves where len(points) = n
         for (int i = 0; i < n; i++) {
-            // compute alpha
+            // TODO is this necessary? ... compute alpha
             double alpha = calculateTangentMagnitude(points[i], points[i+1], tk[i], tk[i+1]);
             double delta = uk[i+1] - uk[i];
             // consruct curve
@@ -187,8 +183,8 @@ namespace Bezier {
         // calculate curve in spline to evaluate
         //TODO undefined if t is outside [0, T]
         t = t - t0_;
-        int n = curves_.size() - 1;
-        int index = std::round((t / T_) * (n));
+        int n = curves_.size();
+        int index = std::floor((t / T_) * (n));
 
         return curves_[index].evaluate(t);
     }
@@ -200,8 +196,8 @@ namespace Bezier {
     VectorXd Spline::dEvaluate(int n, double t) {
         // calculate curve in spline to evaluate
         t = t - t0_;
-        int len = curves_.size() - 1;
-        int index = std::round((t / T_) * (len));
+        int len = curves_.size();
+        int index = std::floor((t / T_) * (len));
 
         return curves_[index].dEvaluate(n, t);
     }

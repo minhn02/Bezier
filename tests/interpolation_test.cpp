@@ -32,7 +32,21 @@ void plot_sin_interpolation() {
 void test_sin_interpolation() {
     auto sin_func = [] (double t) { VectorXd ret(1); ret << std::sin(t); return ret; };
     double period = 2*M_PI;
-    Bezier::Spline spline(sin_func, 500, period);
+    int sample_n = 20;
+
+    Bezier::Spline spline(sin_func, sample_n, period);
+
+    std::vector<double> t_samples(sample_n);
+    std::vector<double> y_samples(sample_n);
+
+    double sample_delta = period/(double)(sample_n-1);
+    double t_sample = 0;
+    for (int i = 0; i < sample_n; i++) {
+        t_samples[i] = t_sample;
+        y_samples[i] = spline.evaluate(t_sample).sum();
+
+        t_sample += sample_delta;
+    }
 
     double MSE = 0;
     double delta = 0.01;
@@ -53,10 +67,11 @@ void test_sin_interpolation() {
         index++;
     }
 
-    plt::plot(x, ySin, "r");
-    plt::plot(x, ySpline, "g");
-    plt::plot(x, MSEs, "b");
-    plt::show();
+    // plt::plot(x, ySin, "r");
+    // plt::plot(x, ySpline, "g");
+    // plt::plot(x, MSEs, "b");
+    // plt::scatter(t_samples, y_samples, 10);
+    // plt::show();
     assert(MSE <= 0.01);
 }
 
@@ -68,7 +83,7 @@ void test_sin_interpolation_derivative() {
 
     double MSE = 0;
     int n = 1000;
-    double delta = period/(double)n;
+    double delta = period/(double)(n-1);
     std::vector<double> x(n);
     std::vector<double> dCurve(n);
     std::vector<double> curve(n);
@@ -81,7 +96,7 @@ void test_sin_interpolation_derivative() {
         t_samples[i] = t_sample;
         y_samples[i] = sin_func(t_sample).sum();
 
-        t_sample += period/(double)sample_n;
+        t_sample += period/(double)(sample_n-1);
     }
 
     int index = 0;
@@ -99,7 +114,7 @@ void test_sin_interpolation_derivative() {
     plt::named_plot("dCurve", x, dCurve, "b");
     plt::named_plot("curve", x, curve, "r");
     plt::named_plot("dFunc", x, dFunc, "g");
-    plt::scatter(t_samples, y_samples);
+    plt::scatter(t_samples, y_samples, 10);
     plt::legend();
     plt::show();
 

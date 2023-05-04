@@ -26,27 +26,13 @@ namespace Bezier {
         */
         Curve();
 
-        //TODO Change constructors to use default arguments 
-
-        /**
-         * @brief Instantiate a n'th order Bezier Curve defined by n control points over [0, 1]
-         * @param pointList List of points that define a bezier curve
-        */
-        Curve(std::vector<VectorXd> pointList);
-
-        /**
-         * @brief Instantiate a n'th order Bezier Curve defined by n control points over [0,T]
-         * @param pointList List of points that define a bezier curve
-         * @param T the interval [0, T] over which the curve is defined
-        */
-        Curve(std::vector<VectorXd> pointList, double T);
-
         /**
          * @brief Instantiate a n'th order Bezier Curve defined by n control points over [t0,T+t0]
          * @param pointList List of points that define a bezier curve
-         * @param T the interval [0, T] over which the curve is defined
+         * @param T the interval [t0, T+t0] over which the curve is defined
+         * @param t0 the start time of the curve
         */
-        Curve(std::vector<VectorXd> pointList, double T, double t0);
+        Curve(std::vector<VectorXd> pointList, double T=1, double t0=0);
 
         /**
          * Evaluates the curve at t
