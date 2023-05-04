@@ -4,7 +4,7 @@
 #include <Eigen/Dense>
 #include <vector>
 #include <functional>
-#include <../src/util.h>
+#include <bezier_util.h>
 #include <cmath>
 #include <assert.h>
 #include <map>

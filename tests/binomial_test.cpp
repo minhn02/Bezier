@@ -1,5 +1,5 @@
 #include <cassert>
-#include "../src/util.h"
+#include "util.h"
 #include <vector>
 #include <cstdio>
 #include <chrono>
