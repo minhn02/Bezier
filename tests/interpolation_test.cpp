@@ -111,12 +111,12 @@ void test_sin_interpolation_derivative() {
     }
     MSE = MSE / (double)n;
 
-    plt::named_plot("dCurve", x, dCurve, "b");
-    plt::named_plot("curve", x, curve, "r");
-    plt::named_plot("dFunc", x, dFunc, "g");
-    plt::scatter(t_samples, y_samples, 10);
-    plt::legend();
-    plt::show();
+    // plt::named_plot("dCurve", x, dCurve, "b");
+    // plt::named_plot("curve", x, curve, "r");
+    // plt::named_plot("dFunc", x, dFunc, "g");
+    // plt::scatter(t_samples, y_samples, 10);
+    // plt::legend();
+    // plt::show();
 
     assert(MSE <= 0.01);
 }
@@ -124,16 +124,46 @@ void test_sin_interpolation_derivative() {
 void test_abs_interpolation() {
     auto abs_func = [] (double t) { VectorXd ret(1); ret << std::abs(t); return ret; };
     double period = 10;
-    Bezier::Spline spline(abs_func, 500, period, -period/2);
+    int sample_n = 20;
+
+    Bezier::Spline spline(abs_func, sample_n, period, -period/2);
+
+    std::vector<double> t_samples(sample_n);
+    std::vector<double> y_samples(sample_n);
+
+    double sample_delta = period/(double)(sample_n-1);
+    double t_sample = -period/2;
+    for (int i = 0; i < sample_n; i++) {
+        t_samples[i] = t_sample;
+        y_samples[i] = spline.evaluate(t_sample).sum();
+
+        t_sample += sample_delta;
+    }
 
     double MSE = 0;
     double delta = 0.01;
-    double n = period/delta;
+    int n = period/delta;
 
+    std::vector<double> x(n);
+    std::vector<double> ySpline(n);
+    std::vector<double> yAbs(n);
+    std::vector<double> MSEs(n);
+
+    int index = 0;
     for (double t = -period/2; t <= period/2; t+=delta) {
-        MSE += std::pow(spline.evaluate(t).sum() - std::abs(t), 2);
+        x[index] = t;
+        ySpline[index] = spline.evaluate(t).sum();
+        yAbs[index] = std::abs(t);
+        MSE += std::pow(ySpline[index] - yAbs[index], 2) / (double) n;
+        MSEs[index] = MSE;
+        index++;
     }
-    MSE = MSE / n;
+
+    plt::plot(x, yAbs, "r");
+    plt::plot(x, ySpline, "g");
+    plt::plot(x, MSEs, "b");
+    plt::scatter(t_samples, y_samples, 10);
+    plt::show();
     assert(MSE <= 0.01);
 }
 
