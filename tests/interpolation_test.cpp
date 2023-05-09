@@ -11,7 +11,7 @@ namespace plt = matplotlibcpp;
 void plot_sin_interpolation() {
     auto sin_func = [] (double t) { VectorXd ret(1); ret << std::sin(t); return ret; };
     double period = 2*M_PI;
-    Bezier::Spline spline(sin_func, 500, period, -period/2);
+    Bezier::Spline<double> spline(sin_func, 500, period, -period/2);
 
     double n = 3000;
     double delta = period/n;
@@ -34,7 +34,7 @@ void test_sin_interpolation() {
     double period = 2*M_PI;
     int sample_n = 20;
 
-    Bezier::Spline spline(sin_func, sample_n, period);
+    Bezier::Spline<double> spline(sin_func, sample_n, period);
 
     std::vector<double> t_samples(sample_n);
     std::vector<double> y_samples(sample_n);
@@ -67,11 +67,11 @@ void test_sin_interpolation() {
         index++;
     }
 
-    // plt::plot(x, ySin, "r");
-    // plt::plot(x, ySpline, "g");
-    // plt::plot(x, MSEs, "b");
-    // plt::scatter(t_samples, y_samples, 10);
-    // plt::show();
+    plt::plot(x, ySin, "r");
+    plt::plot(x, ySpline, "g");
+    plt::plot(x, MSEs, "b");
+    plt::scatter(t_samples, y_samples, 10);
+    plt::show();
     assert(MSE <= 0.01);
 }
 
@@ -79,7 +79,7 @@ void test_sin_interpolation_derivative() {
     auto sin_func = [] (double t) { VectorXd ret(1); ret << std::sin(t); return ret; };
     double period = 6;
     int sample_n = 7;
-    Bezier::Spline spline(sin_func, sample_n, period);
+    Bezier::Spline<double> spline(sin_func, sample_n, period);
 
     double MSE = 0;
     int n = 1000;
@@ -126,7 +126,7 @@ void test_abs_interpolation() {
     double period = 10;
     int sample_n = 20;
 
-    Bezier::Spline spline(abs_func, sample_n, period, -period/2);
+    Bezier::Spline<double> spline(abs_func, sample_n, period, -period/2);
 
     std::vector<double> t_samples(sample_n);
     std::vector<double> y_samples(sample_n);
@@ -170,7 +170,7 @@ void test_abs_interpolation() {
 void test_sin_multidim_interpolation() {
     auto sin_func = [] (double t) { VectorXd ret(2); ret << std::sin(t), std::cos(t); return ret; };
     double period = 2*M_PI;
-    Bezier::Spline spline(sin_func, 500, period);
+    Bezier::Spline<double> spline(sin_func, 500, period);
 
     double MSE = 0;
     double delta = 0.01;

@@ -14,7 +14,7 @@ void test_cubic_curve_evaluation() {
     VectorXd P2(2); P2 << 6, 3;
     VectorXd P3(2); P3 << 1, 20;
 
-    Bezier::Curve curve({P0, P1, P2, P3});
+    Bezier::Curve<double> curve({P0, P1, P2, P3});
 
     // check output vectors, round to 3 decimal places; points evaluated using python script, see top of file
     VectorXd curve0(2); curve0 << 10, 5;
@@ -51,7 +51,7 @@ void test_quintic_curve_evaluation() {
     VectorXd P4(2); P4 << -79, 23;
     VectorXd P5(2); P5 << 5, -8;
 
-    Bezier::Curve curve({P0, P1, P2, P3, P4, P5});
+    Bezier::Curve<double> curve({P0, P1, P2, P3, P4, P5});
 
     // check output vectors, round to 3 decimal places; points evaluated using python script, see top of file
     VectorXd curve0(2); curve0 << 15, 43;
@@ -88,7 +88,7 @@ void test_quintic_curve_evaluation_time_scaled() {
     VectorXd P4(2); P4 << -79, 23;
     VectorXd P5(2); P5 << 5, -8;
 
-    Bezier::Curve curve({P0, P1, P2, P3, P4, P5}, 10);
+    Bezier::Curve<double> curve({P0, P1, P2, P3, P4, P5}, 10);
 
     // check output vectors, round to 3 decimal places; points evaluated using python script, see top of file
     VectorXd curve0(2); curve0 << 15, 43;
@@ -125,7 +125,7 @@ void test_quintic_curve_evaluation_time_offset() {
     VectorXd P4(2); P4 << -79, 23;
     VectorXd P5(2); P5 << 5, -8;
 
-    Bezier::Curve curve({P0, P1, P2, P3, P4, P5}, 1, 5);
+    Bezier::Curve<double> curve({P0, P1, P2, P3, P4, P5}, 1, 5);
 
     // check output vectors, round to 3 decimal places; points evaluated using python script, see top of file
     VectorXd curve0(2); curve0 << 15, 43;

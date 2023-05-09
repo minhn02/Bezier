@@ -3,7 +3,7 @@ project(Bezier VERSION 0.1.0 DESCRIPTION "Library for Construction of Bezier Cur
 
 include_directories(${CMAKE_SOURCE_DIR}/include /usr/local/include)
 
-add_library(Bezier SHARED src/bezier.cpp include/bezier.h src/bezier_util.cpp ${CMAKE_SOURCE_DIR}/include/bezier_util.h)
+add_library(Bezier SHARED include/bezier.h src/bezier_util.cpp ${CMAKE_SOURCE_DIR}/include/bezier_util.h)
 find_package (Eigen3 3.3 REQUIRED NO_MODULE)
 target_link_libraries (Bezier Eigen3::Eigen)
 
@@ -35,7 +35,7 @@ set_target_properties(nlopt PROPERTIES IMPORTED_LOCATION /usr/local/lib/libnlopt
 find_package(PythonLibs REQUIRED)
 include_directories(${PYTHON_INCLUDE_DIRS})
 
-add_executable(optimization src/optimization.cpp src/bezier.cpp include/bezier.h src/bezier_util.cpp include/bezier_util.h)
+add_executable(optimization src/optimization.cpp include/bezier.h src/bezier_util.cpp include/bezier_util.h)
 target_link_libraries(optimization Eigen3::Eigen nlopt)
 
 # Testing
@@ -44,11 +44,11 @@ include(CTest)
 enable_testing()
 
 add_executable(binomial_test tests/binomial_test.cpp include/bezier_util.h src/bezier_util.cpp)
-add_executable(basic_curve_test include/bezier.h src/bezier.cpp tests/basic_curve_test.cpp include/bezier_util.h src/bezier_util.cpp)
+add_executable(basic_curve_test include/bezier.h tests/basic_curve_test.cpp include/bezier_util.h src/bezier_util.cpp)
 target_link_libraries (basic_curve_test Eigen3::Eigen)
-add_executable(derivative_curve_test include/bezier.h src/bezier.cpp tests/derivative_curve_test.cpp include/bezier_util.h src/bezier_util.cpp)
+add_executable(derivative_curve_test include/bezier.h tests/derivative_curve_test.cpp include/bezier_util.h src/bezier_util.cpp)
 target_link_libraries (derivative_curve_test Eigen3::Eigen)
-add_executable(interpolation_test tests/matplotlibcpp.h include/bezier.h src/bezier.cpp tests/interpolation_test.cpp include/bezier_util.h src/bezier_util.cpp)
+add_executable(interpolation_test tests/matplotlibcpp.h include/bezier.h tests/interpolation_test.cpp include/bezier_util.h src/bezier_util.cpp)
 target_link_libraries (interpolation_test Eigen3::Eigen ${PYTHON_LIBRARIES})
 
 add_test(binomial_test binomial_test COMMAND $<TARGET_FILE:cpp_test>)

@@ -14,7 +14,7 @@ void test_d_cubic_curve_evaluation() {
     VectorXd P2(2); P2 << 6, 3;
     VectorXd P3(2); P3 << 1, 20;
 
-    Bezier::Curve curve({P0, P1, P2, P3});
+    Bezier::Curve<double> curve({P0, P1, P2, P3});
 
     // check output vectors, round to 3 decimal places; points evaluated using python script, see top of file
     VectorXd curve0(2); curve0 << -6, -9;
@@ -50,7 +50,7 @@ void test_d_d_cubic_curve_evaluation() {
     VectorXd P2(2); P2 << 6, 3;
     VectorXd P3(2); P3 << 1, 20;
 
-    Bezier::Curve curve({P0, P1, P2, P3});
+    Bezier::Curve<double> curve({P0, P1, P2, P3});
 
     // check output vectors, round to 3 decimal places; points evaluated using python script, see top of file
     VectorXd curve0(2); curve0 << 0, 24;
@@ -85,7 +85,7 @@ void test_d_d_cubic_curve_evaluation_time_scaled() {
     VectorXd P2(2); P2 << 6, 3;
     VectorXd P3(2); P3 << 1, 20;
 
-    Bezier::Curve curve({P0, P1, P2, P3}, 10);
+    Bezier::Curve<double> curve({P0, P1, P2, P3}, 10);
 
     // check output vectors, round to 3 decimal places; points evaluated using python script, see top of file
     VectorXd curve0(2); curve0 << 0, 24;
@@ -120,7 +120,7 @@ void test_d_d_cubic_curve_evaluation_time_scaled_shifted() {
     VectorXd P2(2); P2 << 6, 3;
     VectorXd P3(2); P3 << 1, 20;
 
-    Bezier::Curve curve({P0, P1, P2, P3}, 10, 5);
+    Bezier::Curve<double> curve({P0, P1, P2, P3}, 10, 5);
 
     // check output vectors, round to 3 decimal places; points evaluated using python script, see top of file
     VectorXd curve0(2); curve0 << 0, 24;

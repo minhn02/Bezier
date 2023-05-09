@@ -25,7 +25,7 @@ double cost_func(const std::vector<double> &x, std::vector<double> &grad, void* 
     VectorXd P3 = g2(x[1]);
     VectorXd P2 = P3 - (1/3)*d_g2(x[1]);
 
-    Bezier::Curve curve({P0, P1, P2, P3}, x[0] - t1, t1);
+    Bezier::Curve<double> curve({P0, P1, P2, P3}, x[0] - t1, t1);
     double acc = 0;
     double vel = 0;
     for (double i = t1; i < x[0]; i+=0.01) {
@@ -46,7 +46,7 @@ double bezier_boundary_constraint(const std::vector<double> &x, std::vector<doub
     VectorXd P3 = g2(x[1]);
     VectorXd P2 = P3 - (1/3)*d_g2(x[1]);
 
-    Bezier::Curve curve({P0, P1, P2, P3}, x[0], t1);
+    Bezier::Curve<double> curve({P0, P1, P2, P3}, x[0], t1);
 
     return (curve.evaluate(x[0]) - g2(x[1])).sum();
 }
