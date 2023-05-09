@@ -65,6 +65,9 @@ namespace Bezier {
         return dMap_.at(1);
     }
 
+    double Curve::getT() {return T_;}
+    double Curve::getT0() {return t0_;};
+
     Spline::Spline(std::vector<Curve> curves, double T, double t0) {
         curves_ = curves;
         T_ = T;

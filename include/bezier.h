@@ -55,6 +55,9 @@ namespace Bezier {
          * @param point replace point at pointNumber to this value 
         */
         void setCurvePoint(int pointNumber, VectorXd point);
+
+        double getT();
+        double getT0();
         
         private:
         /**
@@ -62,7 +65,6 @@ namespace Bezier {
         */
         Curve generateDerivativeCurve();
 
-        private:
         std::vector<VectorXd> pointList_;
         int dim_;
         int order_;
