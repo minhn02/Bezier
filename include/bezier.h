@@ -51,8 +51,8 @@ namespace Bezier {
             VectorXd runningSum = VectorXd::Zero(dim_);
             for (int i = 0; i < order_; i++) {
                 runningSum += coefficients_[i] *
-                              std::pow(((T_ - (t-t0_))/T_), (order_ - 1 - i)) *
-                              std::pow((t - t0_)/(T_), i) *
+                              std::pow(1 - ((t-t0_)/(double)T_), (order_ - 1 - i)) *
+                              std::pow((t - t0_)/(double)T_, i) *
                               pointList_[i];
             }
             return runningSum;
@@ -77,9 +77,9 @@ namespace Bezier {
 
             Curve derivative = this->generateDerivativeCurve();
             if (n == 1) {
-                return derivative.evaluate(t);
+                return ((double)1/(double)T_) * derivative.evaluate(t);
             } else {
-                return derivative.dEvaluate(n - 1, t);
+                return std::pow(((double)1/(double)T_), n) * derivative.dEvaluate(n - 1, t);
             }
         }
 

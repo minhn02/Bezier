@@ -67,18 +67,18 @@ void test_sin_interpolation() {
         index++;
     }
 
-    plt::plot(x, ySin, "r");
-    plt::plot(x, ySpline, "g");
-    plt::plot(x, MSEs, "b");
-    plt::scatter(t_samples, y_samples, 10);
-    plt::show();
+    // plt::plot(x, ySin, "r");
+    // plt::plot(x, ySpline, "g");
+    // plt::plot(x, MSEs, "b");
+    // plt::scatter(t_samples, y_samples, 10);
+    // plt::show();
     assert(MSE <= 0.01);
 }
 
 void test_sin_interpolation_derivative() {
     auto sin_func = [] (double t) { VectorXd ret(1); ret << std::sin(t); return ret; };
     double period = 6;
-    int sample_n = 7;
+    int sample_n = 100;
     Bezier::Spline<double> spline(sin_func, sample_n, period);
 
     double MSE = 0;
@@ -111,12 +111,12 @@ void test_sin_interpolation_derivative() {
     }
     MSE = MSE / (double)n;
 
-    // plt::named_plot("dCurve", x, dCurve, "b");
-    // plt::named_plot("curve", x, curve, "r");
+    plt::named_plot("dCurve", x, dCurve, "b");
+    plt::named_plot("curve", x, curve, "r");
     // plt::named_plot("dFunc", x, dFunc, "g");
-    // plt::scatter(t_samples, y_samples, 10);
-    // plt::legend();
-    // plt::show();
+    plt::scatter(t_samples, y_samples, 10);
+    plt::legend();
+    plt::show();
 
     assert(MSE <= 0.01);
 }
@@ -159,11 +159,11 @@ void test_abs_interpolation() {
         index++;
     }
 
-    plt::plot(x, yAbs, "r");
-    plt::plot(x, ySpline, "g");
-    plt::plot(x, MSEs, "b");
-    plt::scatter(t_samples, y_samples, 10);
-    plt::show();
+    // plt::plot(x, yAbs, "r");
+    // plt::plot(x, ySpline, "g");
+    // plt::plot(x, MSEs, "b");
+    // plt::scatter(t_samples, y_samples, 10);
+    // plt::show();
     assert(MSE <= 0.01);
 }
 

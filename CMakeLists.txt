@@ -38,6 +38,9 @@ include_directories(${PYTHON_INCLUDE_DIRS})
 add_executable(optimization src/optimization.cpp include/bezier.h src/bezier_util.cpp include/bezier_util.h)
 target_link_libraries(optimization Eigen3::Eigen nlopt)
 
+add_executable(visualization tests/visualization.cpp tests/matplotlibcpp.h include/bezier.h src/bezier_util.cpp include/bezier_util.h)
+target_link_libraries(visualization Eigen3::Eigen ${PYTHON_LIBRARIES})
+
 # Testing
 
 include(CTest)
