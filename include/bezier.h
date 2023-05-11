@@ -100,6 +100,9 @@ namespace Bezier {
         X getT0() {
             return t0_;
         }
+        std::vector<VectorXd> getPoints() {
+            return pointList_;
+        }
         
         private:
         /**
