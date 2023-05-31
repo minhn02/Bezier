@@ -255,6 +255,7 @@ namespace Bezier {
             }
         }
 
+        //TODO how to incorporate this? (8.51) pg 401 Trajectory Planning For Automatic Machines and Robots
         double calculateTangentMagnitude(VectorXd p0, VectorXd p3, VectorXd t0, VectorXd t3) {
             double a = 16 - (t0 + t3).squaredNorm();
             double b = 12 * (p3 - p0).transpose().dot(t0 + t3);
