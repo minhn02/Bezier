@@ -11,9 +11,15 @@ def d_cubic_bezier_curve(t, P0, P1, P2, P3):
 		   6 * (1-t) * t * (P2-P1) + \
 		   3 * t**2 * (P3-P2)
 
+def scaled_d_cubic_bezier_curve(t, T, P0, P1, P2, P3):
+	return 1/T * d_cubic_bezier_curve(t, P0, P1, P2, P3)
+
 def d_d_cubic_bezier_curve(t, P0, P1, P2, P3):
 	return 6 * (1-t) * (P2 - 2*P1 + P0) + \
 		   6 * t * (P3 - 2*P2 + P1)
+
+def scaled_d_d_cubic_bezier_curve(t, T, P0, P1, P2, P3):
+	return (1/T)**2 * d_d_cubic_bezier_curve(t, P0, P1, P2, P3)
 
 def quintic_bezier_curve(t, P0, P1, P2, P3, P4, P5):
 	return (1-t)**5 * P0 + \
@@ -43,6 +49,16 @@ def evaluate_d_cubic():
 	for i in np.linspace(0, 1, 11):
 		print("t: {}, value: {}".format(i, d_cubic_bezier_curve(i, P0, P1, P2, P3)))
 
+def evaluate_scaled_d_cubic():
+	P0 = np.array([10, 5])
+	P1 = np.array([8, 2])
+	P2 = np.array([6, 3])
+	P3 = np.array([1, 20])
+	print("scaled_d_cubic")
+	T = 10
+	for i in np.linspace(0, 1, 11):
+		print("t: {}, value: {}".format(i, scaled_d_cubic_bezier_curve(i, T, P0, P1, P2, P3)))
+
 def evaluate_d_d_cubic():
 	P0 = np.array([10, 5])
 	P1 = np.array([8, 2])
@@ -51,6 +67,16 @@ def evaluate_d_d_cubic():
 	print("d_d_cubic")
 	for i in np.linspace(0, 1, 11):
 		print("t: {}, value: {}".format(i, d_d_cubic_bezier_curve(i, P0, P1, P2, P3)))
+
+def evaluate_scaled_d_d_cubic():
+	P0 = np.array([10, 5])
+	P1 = np.array([8, 2])
+	P2 = np.array([6, 3])
+	P3 = np.array([1, 20])
+	print("scaled_d_d_cubic")
+	T = 10
+	for i in np.linspace(0, 1, 11):
+		print("t: {}, value: {}".format(i, scaled_d_d_cubic_bezier_curve(i, T, P0, P1, P2, P3)))
 
 ####################### evaluate quintic #######################
 
@@ -67,5 +93,7 @@ def evaluate_quintic():
 
 # evaluate_cubic()
 # evaluate_d_cubic()
-evaluate_d_d_cubic()
+# evaluate_scaled_d_cubic()
+# evaluate_d_d_cubic()
+evaluate_scaled_d_d_cubic()
 # evaluate_quintic()

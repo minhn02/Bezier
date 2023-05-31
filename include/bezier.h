@@ -4,12 +4,29 @@
 #include <Eigen/Dense>
 #include <vector>
 #include <functional>
-#include <bezier_util.h>
 #include <cmath>
 #include <assert.h>
 #include <map>
 
 using namespace Eigen;
+
+namespace Util {
+    std::map<int, std::vector<double>> pascalTriangleMap;
+
+    /**
+    * @brief Returns binomial coefficients [(n 0), (n 1), ..., (n n)]
+    */
+    std::vector<double> generateBinomialCoefficients(int n) {
+        if (!pascalTriangleMap.count(n)) {
+            std::vector<double> row = {1};
+            for (int k=0; k < n; k++) {
+                row.push_back(row[k] * (n-k) / (k+1));
+            }
+            pascalTriangleMap[n] = row;
+        }
+        return pascalTriangleMap[n];
+    }
+}
 
 namespace Bezier {
 
@@ -77,9 +94,9 @@ namespace Bezier {
 
             Curve derivative = this->generateDerivativeCurve();
             if (n == 1) {
-                return ((double)1/(double)T_) * derivative.evaluate(t);
+                return derivative.evaluate(t);
             } else {
-                return std::pow(((double)1/(double)T_), n) * derivative.dEvaluate(n - 1, t);
+                return derivative.dEvaluate(n - 1, t);
             }
         }
 
@@ -111,7 +128,7 @@ namespace Bezier {
         Curve generateDerivativeCurve() {
             std::vector<VectorXd> derivativePointList;
             for (int i = 0; i < order_ - 1; i++) {
-                derivativePointList.push_back((order_ - 1) * (pointList_[i+1] - pointList_[i]));
+                derivativePointList.push_back((1.0/T_) *(order_ - 1) * (pointList_[i+1] - pointList_[i]));
             }
             return Curve(derivativePointList, T_, t0_);
         }

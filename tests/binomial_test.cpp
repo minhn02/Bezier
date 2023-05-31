@@ -1,8 +1,9 @@
 #include <cassert>
-#include "util.h"
 #include <vector>
 #include <cstdio>
 #include <chrono>
+
+#include "bezier.h"
 
 std::vector<std::vector<double>> generatePascalTriangleToRow10() {
     std::vector<std::vector<double>> triangle;

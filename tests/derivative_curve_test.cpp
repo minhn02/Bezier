@@ -90,17 +90,19 @@ void test_d_d_cubic_curve_evaluation_time_scaled() {
     Bezier::Curve<double> curve({P0, P1, P2, P3}, 10);
 
     // check output vectors, round to 3 decimal places; points evaluated using python script, see top of file
-    VectorXd curve0(2); curve0 << 0, 24/100;
-    VectorXd curve01(2); curve01 << -1.8/100, 31.2/100;
-    VectorXd curve02(2); curve02 << -3.6/100, 38.4/100;
-    VectorXd curve03(2); curve03 << -5.4/100, 45.6/100;
-    VectorXd curve04(2); curve04 << -7.2/100, 52.8/100;
-    VectorXd curve05(2); curve05 << -9/100, 60/100;
-    VectorXd curve06(2); curve06 << -10.8/100, 67.2/100;
-    VectorXd curve07(2); curve07 << -12.6/100, 74.4/100;
-    VectorXd curve08(2); curve08 << -14.4/100, 81.6/100;
-    VectorXd curve09(2); curve09 << -16.2/100, 88.8/100;
-    VectorXd curve1(2); curve1 << -18/100, 96/100;
+    VectorXd curve0(2); curve0 << 0, 24.0/100.0;
+    VectorXd curve01(2); curve01 << -1.8/100.0, 31.2/100.0;
+    VectorXd curve02(2); curve02 << -3.6/100.0, 38.4/100.0;
+    VectorXd curve03(2); curve03 << -5.4/100.0, 45.6/100.0;
+    VectorXd curve04(2); curve04 << -7.2/100.0, 52.8/100.0;
+    VectorXd curve05(2); curve05 << -9.0/100.0, 60.0/100.0;
+    VectorXd curve06(2); curve06 << -10.8/100.0, 67.2/100.0;
+    VectorXd curve07(2); curve07 << -12.6/100.0, 74.4/100.0;
+    VectorXd curve08(2); curve08 << -14.4/100.0, 81.6/100.0;
+    VectorXd curve09(2); curve09 << -16.2/100.0, 88.8/100.0;
+    VectorXd curve1(2); curve1 << -18.0/100.0, 96.0/100.0;
+
+    double error = (curve.dEvaluate(2, 0) - curve0).norm();
 
     assert((curve.dEvaluate(2, 0) - curve0).norm() < 0.01);
     assert((curve.dEvaluate(2, 1) - curve01).norm() < 0.01);
@@ -125,17 +127,17 @@ void test_d_d_cubic_curve_evaluation_time_scaled_shifted() {
     Bezier::Curve<double> curve({P0, P1, P2, P3}, 10, 5);
 
     // check output vectors, round to 3 decimal places; points evaluated using python script, see top of file
-    VectorXd curve0(2); curve0 << 0, 24/100;
-    VectorXd curve01(2); curve01 << -1.8/100, 31.2/100;
-    VectorXd curve02(2); curve02 << -3.6/100, 38.4/100;
-    VectorXd curve03(2); curve03 << -5.4/100, 45.6/100;
-    VectorXd curve04(2); curve04 << -7.2/100, 52.8/100;
-    VectorXd curve05(2); curve05 << -9/100, 60/100;
-    VectorXd curve06(2); curve06 << -10.8/100, 67.2/100;
-    VectorXd curve07(2); curve07 << -12.6/100, 74.4/100;
-    VectorXd curve08(2); curve08 << -14.4/100, 81.6/100;
-    VectorXd curve09(2); curve09 << -16.2/100, 88.8/100;
-    VectorXd curve1(2); curve1 << -18/100, 96/100;
+    VectorXd curve0(2); curve0 << 0, 24.0/100.0;
+    VectorXd curve01(2); curve01 << -1.8/100.0, 31.2/100.0;
+    VectorXd curve02(2); curve02 << -3.6/100.0, 38.4/100.0;
+    VectorXd curve03(2); curve03 << -5.4/100.0, 45.6/100.0;
+    VectorXd curve04(2); curve04 << -7.2/100.0, 52.8/100.0;
+    VectorXd curve05(2); curve05 << -9.0/100.0, 60.0/100.0;
+    VectorXd curve06(2); curve06 << -10.8/100.0, 67.2/100.0;
+    VectorXd curve07(2); curve07 << -12.6/100.0, 74.4/100.0;
+    VectorXd curve08(2); curve08 << -14.4/100.0, 81.6/100.0;
+    VectorXd curve09(2); curve09 << -16.2/100.0, 88.8/100.0;
+    VectorXd curve1(2); curve1 << -18.0/100.0, 96.0/100.0;
 
     assert((curve.dEvaluate(2, 5) - curve0).norm() < 0.01);
     assert((curve.dEvaluate(2, 6) - curve01).norm() < 0.01);
@@ -152,7 +154,7 @@ void test_d_d_cubic_curve_evaluation_time_scaled_shifted() {
 
 int main(int argc, char const *argv[]) {
     test_d_cubic_curve_evaluation();
-    // test_d_d_cubic_curve_evaluation();
+    test_d_d_cubic_curve_evaluation();
     test_d_d_cubic_curve_evaluation_time_scaled();
     test_d_d_cubic_curve_evaluation_time_scaled_shifted();
 }

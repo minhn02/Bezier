@@ -2,32 +2,9 @@
 #include "bezier.h"
 #include <cmath>
 #include <functional>
-#include "matplotlibcpp.h"
 #include <numeric>
 
 using namespace Eigen;
-namespace plt = matplotlibcpp;
-
-void plot_sin_interpolation() {
-    auto sin_func = [] (double t) { VectorXd ret(1); ret << std::sin(t); return ret; };
-    double period = 2*M_PI;
-    Bezier::Spline<double> spline(sin_func, 500, period, -period/2);
-
-    double n = 3000;
-    double delta = period/n;
-    std::vector<double> x(n);
-    std::vector<double> y(n);
-
-    int index = 0;
-    for (double t = -period/2; t <= period/2; t+=delta) {
-        x[index] = t;
-        y[index] = spline.evaluate(t).sum();
-        index++;
-    }
-
-    plt::plot(x, y);
-    plt::show();
-}
 
 void test_sin_interpolation() {
     auto sin_func = [] (double t) { VectorXd ret(1); ret << std::sin(t); return ret; };
@@ -67,11 +44,6 @@ void test_sin_interpolation() {
         index++;
     }
 
-    // plt::plot(x, ySin, "r");
-    // plt::plot(x, ySpline, "g");
-    // plt::plot(x, MSEs, "b");
-    // plt::scatter(t_samples, y_samples, 10);
-    // plt::show();
     assert(MSE <= 0.01);
 }
 
@@ -110,13 +82,6 @@ void test_sin_interpolation_derivative() {
         index++;
     }
     MSE = MSE / (double)n;
-
-    plt::named_plot("dCurve", x, dCurve, "b");
-    plt::named_plot("curve", x, curve, "r");
-    // plt::named_plot("dFunc", x, dFunc, "g");
-    plt::scatter(t_samples, y_samples, 10);
-    plt::legend();
-    plt::show();
 
     assert(MSE <= 0.01);
 }
@@ -158,12 +123,6 @@ void test_abs_interpolation() {
         MSEs[index] = MSE;
         index++;
     }
-
-    // plt::plot(x, yAbs, "r");
-    // plt::plot(x, ySpline, "g");
-    // plt::plot(x, MSEs, "b");
-    // plt::scatter(t_samples, y_samples, 10);
-    // plt::show();
     assert(MSE <= 0.01);
 }
 
@@ -183,7 +142,6 @@ void test_sin_multidim_interpolation() {
 }
 
 int main(int argc, char const *argv[]) {
-    // plot_linear_interpolation();
     test_sin_interpolation();
     test_sin_interpolation_derivative();
     test_abs_interpolation();
