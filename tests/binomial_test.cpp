@@ -25,7 +25,7 @@ std::vector<std::vector<double>> generatePascalTriangleToRow10() {
 void test_binomial_generation() {
     std::vector<std::vector<double>> triangle = generatePascalTriangleToRow10();
     for (int i=0; i < 10; i++) {
-        assert(triangle[i] == Util::generateBinomialCoefficients(i));
+        assert(triangle[i] == Bezier::generateBinomialCoefficients(i));
     }
 }
 

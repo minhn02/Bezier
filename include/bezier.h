@@ -10,25 +10,18 @@
 
 using namespace Eigen;
 
-namespace Util {
-    std::map<int, std::vector<double>> pascalTriangleMap;
+namespace Bezier {
 
     /**
     * @brief Returns binomial coefficients [(n 0), (n 1), ..., (n n)]
     */
-    std::vector<double> generateBinomialCoefficients(int n) {
-        if (!pascalTriangleMap.count(n)) {
-            std::vector<double> row = {1};
-            for (int k=0; k < n; k++) {
-                row.push_back(row[k] * (n-k) / (k+1));
-            }
-            pascalTriangleMap[n] = row;
+    inline std::vector<double> generateBinomialCoefficients(int n) {
+        std::vector<double> row = {1};
+        for (int k=0; k < n; k++) {
+            row.push_back(row[k] * (n-k) / (k+1));
         }
-        return pascalTriangleMap[n];
+        return row;
     }
-}
-
-namespace Bezier {
 
     /**
      * @brief Container for a Bezier Curve
@@ -58,7 +51,7 @@ namespace Bezier {
             dim_ = pointList[0].size();
             T_ = T;
             t0_ = t0;
-            coefficients_ = Util::generateBinomialCoefficients(order_ - 1);
+            coefficients_ = generateBinomialCoefficients(order_ - 1);
         }
 
         /**
