@@ -113,6 +113,10 @@ namespace Bezier {
         std::vector<VectorXd> getPoints() {
             return pointList_;
         }
+
+        bool isFinished(X t) {
+            return t > t0_ + T_;
+        }
         
         private:
         /**
@@ -197,6 +201,10 @@ namespace Bezier {
             return curves_[index].dEvaluate(n, t);
         }
 
+        bool isFinished(X t) {
+            return t > t0_ + T_;
+        }
+
         private:
         void initializePointList(std::vector<VectorXd> points, X T, X t0) {
             T_ = T;
@@ -236,8 +244,6 @@ namespace Bezier {
             // bezier curves calculated from (8.51) pg 401 Trajectory Planning For Automatic Machines and Robots
             // yields n-1 curves where len(points) = n
             for (int i = 0; i < n; i++) {
-                // TODO is this necessary? ... compute alpha
-                double alpha = calculateTangentMagnitude(points[i], points[i+1], tk[i], tk[i+1]);
                 double delta = uk[i+1] - uk[i];
                 // consruct curve
                 VectorXd P0 = points[i];
@@ -248,41 +254,6 @@ namespace Bezier {
             }
         }
 
-        //TODO how to incorporate this? (8.51) pg 401 Trajectory Planning For Automatic Machines and Robots
-        double calculateTangentMagnitude(VectorXd p0, VectorXd p3, VectorXd t0, VectorXd t3) {
-            double a = 16 - (t0 + t3).squaredNorm();
-            double b = 12 * (p3 - p0).transpose().dot(t0 + t3);
-            double c = -36 * (p3 - p0).squaredNorm();
-
-            double discriminant = b * b - 4 * a * c;
-
-            if (discriminant < 0) {
-                throw std::runtime_error("The quadratic equation has no real solutions.");
-            }
-
-            double sqrt_discriminant = std::sqrt(discriminant);
-
-            // Calculate the roots using a numerically stable method
-            double q;
-            if (b >= 0) {
-                q = -0.5 * (b + sqrt_discriminant);
-            } else {
-                q = -0.5 * (b - sqrt_discriminant);
-            }
-
-            double root1 = q / a;
-            double root2 = c / q;
-
-            if (root1 > 0 && root2 > 0) {
-                return std::min(root1, root2);
-            } else if (root1 > 0) {
-                return root1;
-            } else if (root2 > 0) {
-                return root2;
-            } else {
-                throw std::runtime_error("The quadratic equation has no positive solutions.");
-            }
-        }
         std::vector<Curve<X>> curves_;
         X T_;
         X t0_;
