@@ -144,6 +144,9 @@ namespace Bezier {
 
         public:
 
+        Spline() {
+        }
+
         /**
          * Curves that form a continous spline over [t0, T+t0]
          * Each curve is spaced so it takes up T/len(curves) time
@@ -199,6 +202,13 @@ namespace Bezier {
             int index = std::floor((t / T_) * (len));
 
             return curves_[index].dEvaluate(n, t);
+        }
+
+         X getT() {
+            return T_;
+        }
+        X getT0() {
+            return t0_;
         }
 
         bool isFinished(X t) {
