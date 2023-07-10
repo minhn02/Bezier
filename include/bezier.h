@@ -190,6 +190,10 @@ namespace Bezier {
             int n = curves_.size();
             int index = std::floor(((double)t / (double)T_) * (n));
 
+            if (index == n) {
+                return curves_[n-1].evaluate(t0_ + T_);
+            }
+
             return curves_[index].evaluate(t);
         }
         VectorXd dEvaluate(X t) {

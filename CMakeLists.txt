@@ -32,6 +32,23 @@ install(EXPORT BezierTargets
         NAMESPACE Bezier::
         DESTINATION lib/cmake/Bezier)
 
+add_library(nlopt SHARED IMPORTED)
+set_target_properties(nlopt PROPERTIES IMPORTED_LOCATION /usr/local/lib/libnlopt.so)
+find_package(PythonLibs REQUIRED)
+include_directories(${PYTHON_INCLUDE_DIRS})
+
+add_executable(optimization src/optimization.cpp include/bezier.h src/bezier_util.cpp include/bezier_util.h)
+target_link_libraries(optimization Eigen3::Eigen nlopt)
+
+add_executable(waypoint_optimization include/matplotlibcpp.h src/waypoint_optimization.cpp include/bezier.h src/bezier_util.cpp include/bezier_util.h)
+target_link_libraries(waypoint_optimization Eigen3::Eigen nlopt ${PYTHON_LIBRARIES})
+
+add_executable(bezier_waypoint_optimization include/matplotlibcpp.h src/bezier_waypoint_optimization.cpp include/bezier.h src/bezier_util.cpp include/bezier_util.h)
+target_link_libraries(bezier_waypoint_optimization Eigen3::Eigen nlopt ${PYTHON_LIBRARIES})
+
+add_executable(visualization tests/visualization.cpp include/matplotlibcpp.h include/bezier.h src/bezier_util.cpp include/bezier_util.h)
+target_link_libraries(visualization Eigen3::Eigen ${PYTHON_LIBRARIES})
+
 # Testing
 
 include(CTest)
@@ -47,12 +64,9 @@ set_target_properties(basic_curve_test PROPERTIES LINKER_LANGUAGE CXX)
 
 add_executable(derivative_curve_test include/bezier.h tests/derivative_curve_test.cpp)
 target_link_libraries (derivative_curve_test Eigen3::Eigen)
-set_target_properties(derivative_curve_test PROPERTIES LINKER_LANGUAGE CXX)
 
-add_executable(interpolation_test include/bezier.h tests/interpolation_test.cpp)
-target_link_libraries (interpolation_test Eigen3::Eigen)
-set_target_properties(interpolation_test PROPERTIES LINKER_LANGUAGE CXX)
-
+add_executable(interpolation_test include/matplotlibcpp.h include/bezier.h tests/interpolation_test.cpp include/bezier_util.h src/bezier_util.cpp)
+target_link_libraries (interpolation_test Eigen3::Eigen ${PYTHON_LIBRARIES})
 
 add_test(binomial_test binomial_test COMMAND $<TARGET_FILE:cpp_test>)
 add_test(basic_curve_test basic_curve_test COMMAND $<TARGET_FILE:cpp_test>)
