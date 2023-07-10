@@ -103,6 +103,10 @@ namespace Bezier {
         std::vector<VectorXd> getPoints() {
             return pointList_;
         }
+
+        bool isFinished(X t) {
+            return t > t0_ + T_;
+        }
         
         private:
         /**
@@ -173,6 +177,10 @@ namespace Bezier {
             int n = curves_.size();
             int index = std::floor((t / T_) * (n));
 
+            if (index == n) {
+                return curves_[n-1].evaluate(t0_ + T_);
+            }
+
             return curves_[index].evaluate(t);
         }
         VectorXd dEvaluate(X t) {
@@ -185,6 +193,10 @@ namespace Bezier {
             int index = std::floor((t / T_) * (len));
 
             return curves_[index].dEvaluate(n, t);
+        }
+
+        bool isFinished(X t) {
+            return t > t0_ + T_;
         }
 
         private:
@@ -227,7 +239,7 @@ namespace Bezier {
             // yields n-1 curves where len(points) = n
             for (int i = 0; i < n; i++) {
                 // TODO is this necessary? ... compute alpha
-                double alpha = calculateTangentMagnitude(points[i], points[i+1], tk[i], tk[i+1]);
+                // double alpha = calculateTangentMagnitude(points[i], points[i+1], tk[i], tk[i+1]);
                 double delta = uk[i+1] - uk[i];
                 // consruct curve
                 VectorXd P0 = points[i];
