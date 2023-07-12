@@ -37,8 +37,8 @@ set_target_properties(nlopt PROPERTIES IMPORTED_LOCATION /usr/local/lib/libnlopt
 find_package(PythonLibs REQUIRED)
 include_directories(${PYTHON_INCLUDE_DIRS})
 
-add_executable(optimization src/optimization.cpp include/bezier.h src/bezier_util.cpp include/bezier_util.h)
-target_link_libraries(optimization Eigen3::Eigen nlopt)
+add_executable(optimization src/optimization.cpp include/matplotlibcpp.h include/bezier.h src/bezier_util.cpp include/bezier_util.h)
+target_link_libraries(optimization Eigen3::Eigen nlopt ${PYTHON_LIBRARIES})
 
 add_executable(waypoint_optimization include/matplotlibcpp.h src/waypoint_optimization.cpp include/bezier.h src/bezier_util.cpp include/bezier_util.h)
 target_link_libraries(waypoint_optimization Eigen3::Eigen nlopt ${PYTHON_LIBRARIES})

@@ -37,20 +37,36 @@ double cost_func(const std::vector<double> &x, std::vector<double> &grad, void* 
     // minimize distance of points from boundary positions
     Eigen::VectorXd final_waypoint(2); final_waypoint << x[2*n_timesteps], x[2*n_timesteps+1];
     double final_diff = (xf - final_waypoint).norm();
-    obj_value += final_diff;
 
     // penalize points from linear trajectory
+    double linear_traj_diff = 0;
     Eigen::VectorXd position_delta = (xf - x0)/n_timesteps;
     for (int i = 1; i < n_timesteps+1; i++) {
         Eigen::VectorXd waypoint(2); waypoint << x[2*i], x[2*i+1];
         Eigen::VectorXd linear_waypoint = x0 + position_delta*i;
-        obj_value += (linear_waypoint - waypoint).norm();
+        linear_traj_diff += (linear_waypoint - waypoint).norm();
     }
 
     // penalize moving steering joint
+    double steering_penalty = 0;
     for (int i = 1; i < n_timesteps; i++) {
-        obj_value += std::abs(x[2*(i+1)] - x[2*i]);
+        steering_penalty += std::abs(x[2*(i+1)] - x[2*i]);
     }
+
+    // penalize acceleration
+    double acceleration_penalty = 0;
+    double time_delta = x[1]/n_timesteps;
+    for (int i = 1; i < n_timesteps; i++) {
+        acceleration_penalty += std::abs(x[2*(i+1)] - x[2*i])/std::pow(time_delta, 2);
+
+        acceleration_penalty += std::abs(x[2*(i+1)+1] - x[1+2*i])/std::pow(time_delta, 2);
+    }
+
+    // penalize time
+    double time_penalty = x[1];
+
+    std::cout << "final_diff: " << final_diff << " linear traj diff: " << linear_traj_diff << " steering penalty: " << steering_penalty << " acceleration penalty: " << acceleration_penalty << " time penalty: " << time_penalty << std::endl;
+    obj_value = 1000*final_diff + linear_traj_diff + steering_penalty + acceleration_penalty/400 + 5*time_penalty;
 
     return obj_value;
 }
@@ -83,8 +99,8 @@ double bogie_velocity_constraint(unsigned n, const double *x, double *grad, void
 
 int main(int argc, char const *argv[]) {
     int num_waypoints = 20;
-    double steering_velocity_bound = 20;
-    double bogie_velocity_bound = 20;
+    double steering_velocity_bound = 500;
+    double bogie_velocity_bound = 500;
     VectorXd x0 = g1(t1);
 
     opt optimization = opt(LN_COBYLA, 2+num_waypoints*2);
@@ -92,16 +108,18 @@ int main(int argc, char const *argv[]) {
     optimization.set_maxtime(1);
 
     // Add velocity constraints
-    std::vector<VelocityConstraintData> velocityConstraints(num_waypoints);
-    for (int i = 0; i < num_waypoints; i++) {
+    std::vector<VelocityConstraintData> velocityConstraints(num_waypoints*2);
+    for (int i = 0; i < num_waypoints; i+=2) {
         VelocityConstraintData data = {i, x0, num_waypoints, steering_velocity_bound};
         velocityConstraints[i] = data;
         optimization.add_inequality_constraint(steering_velocity_constraint, &velocityConstraints[i], 1e-8);
+        data = {i, x0, num_waypoints, bogie_velocity_bound};
+        velocityConstraints[i+1] = data;
         optimization.add_inequality_constraint(bogie_velocity_constraint, &velocityConstraints[i], 1e-8);
     }
 
     // make initial guess
-    double tt_guess = 5;
+    double tt_guess = 1;
     std::vector<double> guess = {M_PI, tt_guess};
     VectorXd xf = g2(M_PI);
     VectorXd linear_step = (xf - x0)/num_waypoints;

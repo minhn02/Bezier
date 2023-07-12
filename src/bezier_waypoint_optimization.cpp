@@ -98,11 +98,13 @@ int main(int argc, char const *argv[]) {
     optimization.set_maxtime(1);
 
     // Add velocity constraints
-    std::vector<VelocityConstraintData> velocityConstraints(num_waypoints);
-    for (int i = 0; i < num_waypoints; i++) {
+    std::vector<VelocityConstraintData> velocityConstraints(num_waypoints*2);
+    for (int i = 0; i < num_waypoints; i+=2) {
         VelocityConstraintData data = {i, x0, num_waypoints, steering_velocity_bound};
         velocityConstraints[i] = data;
         optimization.add_inequality_constraint(steering_velocity_constraint, &velocityConstraints[i], 1e-8);
+        data = {i, x0, num_waypoints, bogie_velocity_bound};
+        velocityConstraints[i+1] = data;
         optimization.add_inequality_constraint(bogie_velocity_constraint, &velocityConstraints[i], 1e-8);
     }
 
