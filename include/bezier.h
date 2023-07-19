@@ -188,7 +188,7 @@ namespace Bezier {
             //TODO undefined if t is outside [0, T]
             t = t - t0_;
             int n = curves_.size();
-            int index = std::floor((t / T_) * (n));
+            int index = std::floor(((double)t / (double)T_) * (n));
 
             return curves_[index].evaluate(t);
         }
@@ -199,7 +199,7 @@ namespace Bezier {
             // calculate curve in spline to evaluate
             t = t - t0_;
             int len = curves_.size();
-            int index = std::floor((t / T_) * (len));
+            int index = std::floor(((double)t / (double)T_) * (len));
 
             return curves_[index].dEvaluate(n, t);
         }
