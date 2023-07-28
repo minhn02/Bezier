@@ -1,5 +1,6 @@
-cmake_minimum_required(VERSION 3.0.0)
+cmake_minimum_required(VERSION 3.5.0)
 project(Bezier VERSION 0.1.0 DESCRIPTION "Library for Construction of Bezier Curves and Splines")
+set (CMAKE_CXX_STANDARD 11)
 
 include_directories(${CMAKE_SOURCE_DIR}/include /usr/local/include)
 
