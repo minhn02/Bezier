@@ -34,19 +34,19 @@ install(EXPORT BezierTargets
 
 add_library(nlopt SHARED IMPORTED)
 set_target_properties(nlopt PROPERTIES IMPORTED_LOCATION /usr/local/lib/libnlopt.so)
-find_package(PythonLibs REQUIRED)
+find_package (Python3 REQUIRED)
 include_directories(${PYTHON_INCLUDE_DIRS})
 
-add_executable(optimization src/optimization.cpp include/matplotlibcpp.h include/bezier.h src/bezier_util.cpp include/bezier_util.h)
+add_executable(optimization src/optimization.cpp include/matplotlibcpp.h include/bezier.h)
 target_link_libraries(optimization Eigen3::Eigen nlopt ${PYTHON_LIBRARIES})
 
-add_executable(waypoint_optimization include/matplotlibcpp.h src/waypoint_optimization.cpp include/bezier.h src/bezier_util.cpp include/bezier_util.h)
+add_executable(waypoint_optimization include/matplotlibcpp.h src/waypoint_optimization.cpp include/bezier.h)
 target_link_libraries(waypoint_optimization Eigen3::Eigen nlopt ${PYTHON_LIBRARIES})
 
-add_executable(bezier_waypoint_optimization include/matplotlibcpp.h src/bezier_waypoint_optimization.cpp include/bezier.h src/bezier_util.cpp include/bezier_util.h)
+add_executable(bezier_waypoint_optimization include/matplotlibcpp.h src/bezier_waypoint_optimization.cpp include/bezier.h)
 target_link_libraries(bezier_waypoint_optimization Eigen3::Eigen nlopt ${PYTHON_LIBRARIES})
 
-add_executable(visualization tests/visualization.cpp include/matplotlibcpp.h include/bezier.h src/bezier_util.cpp include/bezier_util.h)
+add_executable(visualization tests/visualization.cpp include/matplotlibcpp.h include/bezier.h)
 target_link_libraries(visualization Eigen3::Eigen ${PYTHON_LIBRARIES})
 
 # Testing
@@ -65,7 +65,7 @@ set_target_properties(basic_curve_test PROPERTIES LINKER_LANGUAGE CXX)
 add_executable(derivative_curve_test include/bezier.h tests/derivative_curve_test.cpp)
 target_link_libraries (derivative_curve_test Eigen3::Eigen)
 
-add_executable(interpolation_test include/matplotlibcpp.h include/bezier.h tests/interpolation_test.cpp include/bezier_util.h src/bezier_util.cpp)
+add_executable(interpolation_test include/matplotlibcpp.h include/bezier.h tests/interpolation_test.cpp)
 target_link_libraries (interpolation_test Eigen3::Eigen ${PYTHON_LIBRARIES})
 
 add_test(binomial_test binomial_test COMMAND $<TARGET_FILE:cpp_test>)
