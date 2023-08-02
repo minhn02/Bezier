@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5.0)
-project(Bezier VERSION 0.1.0 DESCRIPTION "Library for Construction of Bezier Curves and Splines")
-set (CMAKE_CXX_STANDARD 11)
+project(Bezier VERSION 0.1.0 DESCRIPTION "Library for Construction of Bezier Curves and Splines" LANGUAGES C CXX)
+set (CMAKE_CXX_STANDARD 14)
 
 include_directories(${CMAKE_SOURCE_DIR}/include /usr/local/include)
 
@@ -34,8 +34,11 @@ install(EXPORT BezierTargets
 
 add_library(nlopt SHARED IMPORTED)
 set_target_properties(nlopt PROPERTIES IMPORTED_LOCATION /usr/local/lib/libnlopt.so)
-find_package (Python3 REQUIRED)
+find_package(PythonLibs REQUIRED)
 include_directories(${PYTHON_INCLUDE_DIRS})
+
+find_package(Boost REQUIRED)
+INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
 
 add_executable(optimization src/optimization.cpp include/matplotlibcpp.h include/bezier.h)
 target_link_libraries(optimization Eigen3::Eigen nlopt ${PYTHON_LIBRARIES})
@@ -46,8 +49,15 @@ target_link_libraries(waypoint_optimization Eigen3::Eigen nlopt ${PYTHON_LIBRARI
 add_executable(bezier_waypoint_optimization include/matplotlibcpp.h src/bezier_waypoint_optimization.cpp include/bezier.h)
 target_link_libraries(bezier_waypoint_optimization Eigen3::Eigen nlopt ${PYTHON_LIBRARIES})
 
+add_executable(trajectory_bezier_waypoint_optimization include/matplotlibcpp.h src/trajectory_bezier_waypoint_optimization.cpp src/rover_trajectory.cpp include/bezier.h include/rover_trajectory.h)
+target_include_directories(trajectory_bezier_waypoint_optimization PRIVATE ${Boost_INCLUDE_DIRS})
+target_link_libraries(trajectory_bezier_waypoint_optimization Eigen3::Eigen nlopt ${PYTHON_LIBRARIES})
+
 add_executable(visualization tests/visualization.cpp include/matplotlibcpp.h include/bezier.h)
 target_link_libraries(visualization Eigen3::Eigen ${PYTHON_LIBRARIES})
+
+add_executable(harmonic_example src/harmonic_example.cpp)
+target_link_libraries(harmonic_example ${Boost_LIBRARIES})
 
 # Testing
 
@@ -67,6 +77,9 @@ target_link_libraries (derivative_curve_test Eigen3::Eigen)
 
 add_executable(interpolation_test include/matplotlibcpp.h include/bezier.h tests/interpolation_test.cpp)
 target_link_libraries (interpolation_test Eigen3::Eigen ${PYTHON_LIBRARIES})
+
+add_executable(rover_trajectory_test tests/rover_trajectory_test.cpp include/rover_trajectory.h src/rover_trajectory.cpp include/bezier.h)
+target_link_libraries (rover_trajectory_test Eigen3::Eigen ${PYTHON_LIBRARIES} ${Boost_LIBRARIES})
 
 add_test(binomial_test binomial_test COMMAND $<TARGET_FILE:cpp_test>)
 add_test(basic_curve_test basic_curve_test COMMAND $<TARGET_FILE:cpp_test>)
