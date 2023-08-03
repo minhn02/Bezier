@@ -67,8 +67,22 @@ class wheel_displacement {
     }
 };
 
-std::vector<std::vector<double>> eval_displacement_points(std::vector<double> beta_list, double dt, std::vector<double> initial_position, double initial_beta) {
+Vector3d find_closest_waypoint(Vector3d curr_position, Vector3d waypoint) {
+    Vector2d d; d << 1, 0; // assuming straight line since all gaits have straight line trajectories
+
+    Vector2d curr_vec2d; curr_vec2d << curr_position(0), curr_position(1);
+    Vector2d waypoint_vec2d; waypoint_vec2d << waypoint(0), waypoint(1);
+
+    Vector2d vector_diff = curr_vec2d - waypoint_vec2d;
+    double t = vector_diff.dot(d) / d.dot(d);
+    Vector2d proj = t * d;
+    Vector3d proj_3d; proj_3d << proj(0), proj(1), 0;
+    return waypoint + proj_3d;
+}
+
+std::vector<std::vector<double>> transform_joint_movement(std::vector<double> beta_list, double dt, std::vector<double> initial_position, double initial_beta) {
     size_t num_points = beta_list.size();
+    
     // flip sign of beta for convention
     initial_beta *= -1;
 
@@ -77,16 +91,16 @@ std::vector<std::vector<double>> eval_displacement_points(std::vector<double> be
     std::vector<double> dbdt;
     std::vector<std::vector<double>> w(4, std::vector<double>{});
     std::vector<double> V;
-    double beta_prev = beta_list[0];
+    double beta_prev = beta_list[0]*DEG_TO_RAD;
     double delta_x, delta_y, delta_theta, theta_back, theta_front = 0;
 
     Matrix3d Rbeta = createYawRotationMatrix(initial_beta/2, true);
     
     std::vector<Vector3d> Xw;
-    Vector3d wheel1; wheel1 << lx + initial_position[0], ly + initial_position[1], (initial_beta/2 + initial_position[2])*DEG_TO_RAD;
-    Vector3d wheel2; wheel2 << lx + initial_position[0], -ly + initial_position[1], (initial_beta/2 + initial_position[2])*DEG_TO_RAD;
-    Vector3d wheel3; wheel3 << -lx + initial_position[0], ly + initial_position[1], -(initial_beta/2 + initial_position[2])*DEG_TO_RAD;
-    Vector3d wheel4; wheel4 << -lx + initial_position[0], -ly + initial_position[1], -(initial_beta/2 + initial_position[2])*DEG_TO_RAD;
+    Vector3d wheel1; wheel1 << lx + initial_position[0], ly + initial_position[1], (initial_beta/2)*DEG_TO_RAD;
+    Vector3d wheel2; wheel2 << lx + initial_position[0], -ly + initial_position[1], (initial_beta/2)*DEG_TO_RAD;
+    Vector3d wheel3; wheel3 << -lx + initial_position[0], ly + initial_position[1], -(initial_beta/2)*DEG_TO_RAD;
+    Vector3d wheel4; wheel4 << -lx + initial_position[0], -ly + initial_position[1], -(initial_beta/2)*DEG_TO_RAD;
 
     Xw.push_back(Rbeta * wheel1);
     Xw.push_back(Rbeta * wheel2);
@@ -143,22 +157,21 @@ std::vector<std::vector<double>> eval_displacement_points(std::vector<double> be
             delta_x += Xw_vec[wheel][0];
             delta_y += Xw_vec[wheel][1];
         }
-        delta_x = (delta_x/4)*1e3;
-        delta_y = (delta_y/4)*1e3;
+        delta_x = (delta_x/4);
+        delta_y = (delta_y/4);
 
         //find theta perpendicular to the rover's front axle (between wheels 1 and 2)
-        double theta_front = std::atan2(Xw_vec[0][1] - Xw_vec[1][1], Xw_vec[1][0] - Xw_vec[0][0]);
-        double theta_back = std::atan2(Xw_vec[2][1] - Xw_vec[3][1], Xw_vec[3][0] - Xw_vec[2][0]);
-        delta_theta = (theta_front + theta_back)/2;
+        theta_front = std::atan2(Xw[1][0] - Xw[0][0], Xw[0][1] - Xw[1][1]);
+        delta_theta = theta_front;
 
-        evaluated_displacement_points[i] = {delta_x, delta_y, delta_theta};
+        evaluated_displacement_points[i] = {delta_x, delta_y, delta_theta*RAD_TO_DEG};
     }
 
     return evaluated_displacement_points;
 }
 
 std::vector<double> calculate_rover_displacement(std::vector<double> beta_list, double dt, std::vector<double> initial_position, double initial_beta) {
-    return eval_displacement_points(beta_list, dt, initial_position, initial_beta).back();
+    return transform_joint_movement(beta_list, dt, initial_position, initial_beta).back();
 }
 
 //TODO change to passing in a gait and can call .evaluate() to get positions
@@ -170,7 +183,7 @@ Bezier::Spline<double> translate_to_cartesian_gait(VectorXd (*func)(double), siz
         beta_list[i] = func(t0+step*i)(0);
     }
 
-    std::vector<std::vector<double>> displacements = eval_displacement_points(beta_list, step, initial_position, -40.0);
+    std::vector<std::vector<double>> displacements = transform_joint_movement(beta_list, step, initial_position, -40.0);
     std::vector<VectorXd> displacement_vectors(displacements.size(), VectorXd(3));
 
     for (size_t i = 0; i < displacements.size(); i++) {

@@ -11,6 +11,11 @@
 
 
 namespace RoverTrajectory {
+
+    std::vector<std::vector<double>> transform_joint_movement(std::vector<double> beta_list, double dt, std::vector<double> initial_position, double initial_beta);
+
+    Vector3d find_closest_waypoint(Vector3d curr_position, Vector3d waypoint);
+
     /***
         * @brief Returns the displacement of a rover over time
         * @param func a function that returns the velocity of the rover at time t

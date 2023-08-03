@@ -16,11 +16,13 @@ double period = 2*M_PI;
 auto g1 = [](double t) {VectorXd val(2); val << std::sin(t), std::cos(t); return val;};
 auto d_g1 = [](double t) {VectorXd val(2); val << std::cos(t), -std::sin(t); return val;};
 
-auto g2 = [](double t) {VectorXd val(2); val << std::cos(t) + 10, std::sin(t) + 4; return val;};
-auto d_g2 = [](double t) {VectorXd val(2); val << -std::sin(t), std::cos(t); return val;};
+auto g2 = [](double t) {VectorXd val(2); val << std::cos(4*t), std::sin(4*t); return val;};
+auto d_g2 = [](double t) {VectorXd val(2); val << 4*-std::sin(4*t), 4*std::cos(4*t); return val;};
 
 Bezier::Spline<double> g1_traj = RoverTrajectory::translate_to_cartesian_gait(g1, 1000, period, 0, {0, 0, 0});
 Bezier::Spline<double> g2_traj = RoverTrajectory::translate_to_cartesian_gait(g2, 1000, period, 0, {0, 0, 0});
+
+Vector3d g2_traj_displacement;
 
 
 double t1 = M_PI;
@@ -42,7 +44,7 @@ double cost_func(const std::vector<double> &x, std::vector<double> &grad, void* 
     // minimize distance of points from boundary positions
     Eigen::VectorXd final_waypoint(2); final_waypoint << x[2*n_timesteps], x[2*n_timesteps+1];
     double final_diff = (xf - final_waypoint).norm();
-    obj_value += final_diff;
+    obj_value += 500*final_diff;
 
     // penalize points from bezier trajectory
     VectorXd P0 = x0;
@@ -51,6 +53,12 @@ double cost_func(const std::vector<double> &x, std::vector<double> &grad, void* 
     VectorXd P2 = P3 - d_g2(x[0])*x[1]/3;
     Bezier::Curve<double> curve({P0, P1, P2, P3}, x[1], t1);
     double time_delta = x[1]/n_timesteps;
+
+    for (int i = 1; i < n_timesteps+1; i++) {
+        Eigen::VectorXd waypoint(2); waypoint << x[2*i], x[2*i+1];
+        Eigen::VectorXd bezier_waypoint = curve.evaluate(t1 + time_delta*i);
+        obj_value += (bezier_waypoint - waypoint).norm();
+    }
 
     //calculate displacement caused by taking trajectory
     std::vector<VectorXd> waypoints(20+1, VectorXd(2));
@@ -68,24 +76,19 @@ double cost_func(const std::vector<double> &x, std::vector<double> &grad, void* 
     }
 
     VectorXd initial_vec = g1_traj.evaluate(t1);
-    std::vector<double> displacement = RoverTrajectory::calculate_rover_displacement(beta_list, x[1], {initial_vec(0), initial_vec(1), initial_vec(2)}, x0(0));
+    std::vector<double> displacement = RoverTrajectory::calculate_rover_displacement(beta_list, x[1]/(double)num_trajectory_points, {initial_vec(0), initial_vec(1), initial_vec(2)}, x0(0));
+    Vector3d displacement_vec; displacement_vec << displacement[0], displacement[1], displacement[2];
     VectorXd actual_displacement = g2_traj.evaluate(x[0]);
     std::cout << "rover displacement: [" << displacement[0] << ", " << displacement[1] << ", " << displacement[2] << "]" << std::endl;
     std::cout << "gait displacement: [" << actual_displacement[0] << ", " << actual_displacement[1] << ", " << actual_displacement[2] << "]" << std::endl;
-    VectorXd displacement_vec(3); displacement_vec << displacement[0], displacement[1], displacement[2];
-    obj_value += 5*(displacement_vec - actual_displacement).norm();
-    std::cout << "displacement_norm: " << (displacement_vec - actual_displacement).norm() << std::endl;
 
-    for (int i = 1; i < n_timesteps+1; i++) {
-        Eigen::VectorXd waypoint(2); waypoint << x[2*i], x[2*i+1];
-        Eigen::VectorXd bezier_waypoint = curve.evaluate(t1 + time_delta*i);
-        obj_value += (bezier_waypoint - waypoint).norm();
-    }
-
-    // penalize moving steering joint
-    for (int i = 1; i < n_timesteps; i++) {
-        obj_value += std::abs(x[2*(i+1)] - x[2*i]);
-    }
+    // find closest point to rover displacement
+    Vector3d closest_point = RoverTrajectory::find_closest_waypoint(displacement_vec, actual_displacement);
+    std::cout << "closest_point: [" << closest_point[0] << ", " << closest_point[1] << ", " << closest_point[2] << "]" << std::endl;
+    g2_traj_displacement = closest_point - actual_displacement;
+    double diff = (closest_point - displacement_vec).norm();
+    obj_value += diff;
+    std::cout << "displacement_norm: " << (closest_point - displacement_vec).norm() << std::endl;
 
     return obj_value;
 }
@@ -124,7 +127,7 @@ int main(int argc, char const *argv[]) {
 
     opt optimization = opt(LN_COBYLA, 2+num_waypoints*2);
     optimization.set_xtol_rel(1e-2);
-    optimization.set_maxtime(10);
+    optimization.set_maxtime(1);
 
     // Add velocity constraints
     std::vector<VelocityConstraintData> velocityConstraints(num_waypoints*2);
@@ -175,8 +178,8 @@ int main(int argc, char const *argv[]) {
     Bezier::Spline<double> spline = Bezier::Spline<double>(waypoints, guess[1], t1);
     //plot output
     std::vector<double> xVals, g1Vals, g2Vals, splineVals;
-    int num_points = 100;
-    double time_delta = guess[1]/(num_points);
+    int num_points = 1000;
+    double time_delta = guess[1]/(num_points - 1);
     for (int i = 0; i < num_points; i++) {
         double x = t1 + time_delta*i;
         xVals.push_back(x);
@@ -185,9 +188,52 @@ int main(int argc, char const *argv[]) {
         splineVals.push_back(spline.evaluate(x)(0));
     }
 
-    plt::plot(xVals, g1Vals, "r");
-    plt::plot(xVals, g2Vals, "b");
-    plt::plot(xVals, splineVals, "g");
+    plt::figure();
+    plt::named_plot("gait1 joint", xVals, g1Vals, "r");
+    plt::named_plot("gait2 joint", xVals, g2Vals, "b");
+    plt::named_plot("generated transition", xVals, splineVals, "g");
+    plt::legend();
+    plt::title("Joint Space Transition");
+    plt::show();
+
+    // plot trajectory
+
+    // generate transition trajectory
+    VectorXd initial_vector = g1_traj.evaluate(t1);
+
+    std::vector<double> transition_trajectory_vals_x;
+    std::vector<double> transition_trajectory_vals_y;
+
+    std::vector<double> g1_trajectory_vals_x;
+    std::vector<double> g1_trajectory_vals_y;
+
+    std::vector<double> g2_trajectory_vals_x;
+    std::vector<double> g2_trajectory_vals_y;
+
+    std::vector<std::vector<double>> transition_trajectory = RoverTrajectory::transform_joint_movement(splineVals, time_delta, {initial_vector(0), initial_vector(1), initial_vector(2)}, g1(t1)(0));
+
+    double trajectory_time_step = period/(num_points - 1);
+    for (int i = 0; i < num_points; i++) {
+        transition_trajectory_vals_x.push_back(transition_trajectory[i][0]);
+        transition_trajectory_vals_y.push_back(transition_trajectory[i][1]);
+
+        // if (trajectory_time_step*i < t1) {
+            g1_trajectory_vals_x.push_back(g1_traj.evaluate(trajectory_time_step*i)(0));
+            g1_trajectory_vals_y.push_back(g1_traj.evaluate(trajectory_time_step*i)(1));
+        // }
+
+        if (trajectory_time_step*i > guess[0]) {
+            g2_trajectory_vals_x.push_back(g2_traj.evaluate(trajectory_time_step*i)(0) + g2_traj_displacement(0));
+            g2_trajectory_vals_y.push_back(g2_traj.evaluate(trajectory_time_step*i)(1) + g2_traj_displacement(1));
+        }
+    }
+
+    plt::figure();
+    plt::named_plot("generated transition trajectory", transition_trajectory_vals_x, transition_trajectory_vals_y);
+    plt::named_plot("gait1 trajectory", g1_trajectory_vals_x, g1_trajectory_vals_y);
+    plt::named_plot("gait2 trajectory", g2_trajectory_vals_x, g2_trajectory_vals_y);
+    plt::title("Cartesian Trajectory Transition");
+    plt::legend();
     plt::show();
 
     return 0;
