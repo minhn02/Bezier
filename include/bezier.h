@@ -190,11 +190,11 @@ namespace Bezier {
             int n = curves_.size();
             int index = std::floor(((double)t / (double)T_) * (n));
 
-            if (index >= n) {
-                index = n-1;
+            if (index > n-1) {
+                return curves_[n-1].evaluate(t0_ + T_);
             }
             if (index < 0) {
-                index = 0; 
+                return curves_[0].evaluate(t0_);
             }
 
             return curves_[index].evaluate(t);
@@ -208,11 +208,11 @@ namespace Bezier {
             int len = curves_.size();
             int index = std::floor(((double)t / (double)T_) * (len));
 
-            if (index >= n) {
-                index = n-1;
+            if (index > len-1) {
+                return curves_[len-1].dEvaluate(t0_ + T_);
             }
             if (index < 0) {
-                index = 0; 
+                return curves_[0].dEvaluate(t0_);
             }
 
             return curves_[index].dEvaluate(n, t);
