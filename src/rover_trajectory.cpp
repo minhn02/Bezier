@@ -143,9 +143,7 @@ std::vector<std::vector<double>> transform_joint_movement(std::vector<double> be
 
             wheel_displacement wheel_disp(r*w[wheel][i], V[i], wheel, beta, dbdt[i]);
 
-            std::vector<state_type> x_vec;
-            std::vector<double> times;
-            size_t steps = boost::numeric::odeint::integrate(wheel_disp, Xw_vec[wheel], 0.0, dt, dt/100, push_back_state_and_time(x_vec, times));
+            size_t steps = boost::numeric::odeint::integrate(wheel_disp, Xw_vec[wheel], 0.0, dt, dt);
         }
 
         beta_prev = beta;
